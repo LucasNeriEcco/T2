@@ -1,0 +1,134 @@
+{% extends "base.html" %}
+{% block title %}Serviços de Boosting – BoostPro{% endblock %}
+
+{% block content %}
+
+<!-- ═══════════════ HERO SECTION ═══════════════ -->
+<section class="hero-section text-center">
+  <div class="container">
+    <div class="hero-badge mb-3">
+      <i class="bi bi-lightning-charge-fill me-2"></i>Serviços Premium de Boosting
+    </div>
+    <h1 class="hero-title">
+      Suba de <span class="text-gradient">Rank</span> com<br />os Melhores Boosters
+    </h1>
+    <p class="hero-subtitle">
+      Rank boosting e account leveling para os principais jogos online.<br />
+      Resultados garantidos, entrega rápida e total segurança.
+    </p>
+    <div class="d-flex gap-3 justify-content-center flex-wrap">
+      <a href="#servicos" class="btn btn-primary btn-lg px-4">
+        <i class="bi bi-controller me-2"></i>Ver Serviços
+      </a>
+      {% if not current_user.is_authenticated %}
+      <a href="{{ url_for('auth.cadastro') }}" class="btn btn-outline-light btn-lg px-4">
+        <i class="bi bi-person-plus me-2"></i>Criar Conta
+      </a>
+      {% endif %}
+    </div>
+
+    <!-- Stats -->
+    <div class="hero-stats mt-5">
+      <div class="stat-item">
+        <span class="stat-number">+5.000</span>
+        <span class="stat-label">Clientes atendidos</span>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="stat-item">
+        <span class="stat-number">98%</span>
+        <span class="stat-label">Satisfação</span>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="stat-item">
+        <span class="stat-number">24h</span>
+        <span class="stat-label">Suporte disponível</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ FEATURES ═══════════════ -->
+<section class="features-section py-5">
+  <div class="container">
+    <div class="row g-4 justify-content-center">
+      <div class="col-md-4">
+        <div class="feature-card text-center">
+          <div class="feature-icon"><i class="bi bi-shield-check"></i></div>
+          <h5>100% Seguro</h5>
+          <p class="text-muted small">Boosters profissionais com acesso seguro à sua conta.</p>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="feature-card text-center">
+          <div class="feature-icon"><i class="bi bi-lightning-charge"></i></div>
+          <h5>Entrega Rápida</h5>
+          <p class="text-muted small">Cumprimos os prazos estipulados com máxima eficiência.</p>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="feature-card text-center">
+          <div class="feature-icon"><i class="bi bi-headset"></i></div>
+          <h5>Suporte 24/7</h5>
+          <p class="text-muted small">Atendimento dedicado durante todo o processo de boost.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ SERVIÇOS ═══════════════ -->
+<section id="servicos" class="services-section py-5">
+  <div class="container">
+    <div class="section-header text-center mb-5">
+      <span class="section-badge">Catálogo</span>
+      <h2 class="section-title mt-2">Nossos Serviços</h2>
+      <p class="text-muted">Escolha o serviço ideal para o seu jogo favorito.</p>
+    </div>
+
+    {% if servicos %}
+      <div class="row g-4">
+        {% for servico in servicos %}
+        <div class="col-sm-6 col-lg-4">
+          <div class="service-card">
+            <div class="service-card-header">
+              <span class="game-badge">{{ servico.jogo }}</span>
+              <span class="service-type-badge">{{ servico.tipo_servico }}</span>
+            </div>
+            <div class="service-card-body">
+              <p class="service-desc text-muted">
+                {{ servico.descricao or "Serviço de boosting de alta qualidade com garantia de resultado." }}
+              </p>
+              <div class="service-meta">
+                <div class="service-meta-item">
+                  <i class="bi bi-clock me-1 text-primary"></i>
+                  <span>{{ servico.prazo_estimado }}</span>
+                </div>
+              </div>
+            </div>
+            <div class="service-card-footer">
+              <span class="service-price">R$ {{ "%.2f"|format(servico.preco|float) }}</span>
+              <button class="btn btn-primary btn-sm" onclick="window.location='{{ url_for('auth.cadastro') }}'">
+                <i class="bi bi-cart-plus me-1"></i>Contratar
+              </button>
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <!-- Estado vazio -->
+      <div class="empty-state text-center py-5">
+        <i class="bi bi-controller display-1 text-muted"></i>
+        <h4 class="mt-3">Nenhum serviço cadastrado ainda.</h4>
+        <p class="text-muted">Em breve, novos serviços serão disponibilizados.</p>
+        {% if current_user.is_authenticated and current_user.is_admin() %}
+        <a href="{{ url_for('services.novo_servico') }}" class="btn btn-primary mt-2">
+          <i class="bi bi-plus-circle me-2"></i>Adicionar Serviço
+        </a>
+        {% endif %}
+      </div>
+    {% endif %}
+  </div>
+</section>
+
+{% endblock %}

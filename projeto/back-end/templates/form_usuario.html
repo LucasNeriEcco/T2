@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+{% block title %}{{ titulo }} – BoostPro Admin{% endblock %}
+
+{% block content %}
+<div class="admin-page py-5">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-12 col-md-8 col-lg-6">
+
+        <div class="admin-form-card">
+          <div class="admin-form-header">
+            <h2 class="page-title mb-1">
+              <i class="bi bi-person-fill text-primary me-2"></i>{{ titulo }}
+            </h2>
+            <p class="text-muted small mb-0">Preencha os dados do usuário.</p>
+          </div>
+
+          <form method="POST" novalidate>
+            {{ form.hidden_tag() }}
+
+            <!-- Nome -->
+            <div class="mb-3">
+              <label class="form-label">{{ form.nome.label.text }}</label>
+              {{ form.nome(class="form-control form-control-dark" + (" is-invalid" if form.nome.errors else ""),
+                           placeholder="Nome completo") }}
+              {% for erro in form.nome.errors %}
+                <div class="invalid-feedback">{{ erro }}</div>
+              {% endfor %}
+            </div>
+
+            <!-- E-mail -->
+            <div class="mb-3">
+              <label class="form-label">{{ form.email.label.text }}</label>
+              {{ form.email(class="form-control form-control-dark" + (" is-invalid" if form.email.errors else ""),
+                            placeholder="email@exemplo.com") }}
+              {% for erro in form.email.errors %}
+                <div class="invalid-feedback">{{ erro }}</div>
+              {% endfor %}
+            </div>
+
+            <!-- Tipo de usuário (apenas no formulário de edição) -->
+            {% if form.tipo_usuario is defined %}
+            <div class="mb-3">
+              <label class="form-label">{{ form.tipo_usuario.label.text }}</label>
+              {{ form.tipo_usuario(class="form-select form-select-dark" + (" is-invalid" if form.tipo_usuario.errors else "")) }}
+              {% for erro in form.tipo_usuario.errors %}
+                <div class="invalid-feedback">{{ erro }}</div>
+              {% endfor %}
+            </div>
+            {% endif %}
+
+            <!-- Senha -->
+            {% if form.senha is defined %}
+            <div class="mb-3">
+              <label class="form-label">{{ form.senha.label.text }}</label>
+              <div class="input-group">
+                {{ form.senha(class="form-control form-control-dark" + (" is-invalid" if form.senha.errors else ""),
+                              placeholder="Mínimo 6 caracteres", id="senhaCadastro") }}
+                <button class="btn btn-dark border-secondary toggle-password" type="button" data-target="senhaCadastro">
+                  <i class="bi bi-eye-fill"></i>
+                </button>
+              </div>
+              {% for erro in form.senha.errors %}
+                <div class="invalid-feedback d-block">{{ erro }}</div>
+              {% endfor %}
+            </div>
+            {% endif %}
+
+            <!-- Confirmar Senha -->
+            {% if form.confirmar_senha is defined %}
+            <div class="mb-4">
+              <label class="form-label">{{ form.confirmar_senha.label.text }}</label>
+              <div class="input-group">
+                {{ form.confirmar_senha(class="form-control form-control-dark" + (" is-invalid" if form.confirmar_senha.errors else ""),
+                                        placeholder="Repita a senha", id="confirmarSenhaCadastro") }}
+                <button class="btn btn-dark border-secondary toggle-password" type="button" data-target="confirmarSenhaCadastro">
+                  <i class="bi bi-eye-fill"></i>
+                </button>
+              </div>
+              {% for erro in form.confirmar_senha.errors %}
+                <div class="invalid-feedback d-block">{{ erro }}</div>
+              {% endfor %}
+            </div>
+            {% endif %}
+
+            <!-- Nova Senha (edição) -->
+            {% if form.nova_senha is defined %}
+            <div class="mb-4">
+              <label class="form-label">{{ form.nova_senha.label.text }}</label>
+              <div class="input-group">
+                {{ form.nova_senha(class="form-control form-control-dark" + (" is-invalid" if form.nova_senha.errors else ""),
+                                   placeholder="Deixe em branco para não alterar", id="novaSenha") }}
+                <button class="btn btn-dark border-secondary toggle-password" type="button" data-target="novaSenha">
+                  <i class="bi bi-eye-fill"></i>
+                </button>
+              </div>
+              {% for erro in form.nova_senha.errors %}
+                <div class="invalid-feedback d-block">{{ erro }}</div>
+              {% endfor %}
+            </div>
+            {% endif %}
+
+            <!-- Botões -->
+            <div class="d-flex gap-3 mt-4">
+              {{ form.submit(class="btn btn-primary px-4") }}
+              <a href="{{ url_for('users.listar_usuarios') }}" class="btn btn-outline-secondary px-4">
+                <i class="bi bi-x-lg me-1"></i>Cancelar
+              </a>
+            </div>
+          </form>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

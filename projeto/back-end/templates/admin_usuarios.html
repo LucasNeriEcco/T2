@@ -1,0 +1,131 @@
+{% extends "base.html" %}
+{% block title %}Gerenciar Usuários – BoostPro Admin{% endblock %}
+
+{% block content %}
+<div class="admin-page py-5">
+  <div class="container">
+
+    <!-- Cabeçalho -->
+    <div class="d-flex align-items-center justify-content-between mb-4">
+      <div>
+        <h1 class="page-title mb-1">
+          <i class="bi bi-people-fill text-primary me-2"></i>Usuários
+        </h1>
+        <p class="text-muted mb-0">Gerencie todos os usuários cadastrados no sistema.</p>
+      </div>
+      <a href="{{ url_for('users.novo_usuario') }}" class="btn btn-primary">
+        <i class="bi bi-plus-lg me-2"></i>Novo Usuário
+      </a>
+    </div>
+
+    <!-- Tabela de usuários -->
+    <div class="admin-table-card">
+      <div class="table-responsive">
+        <table class="table table-dark table-hover table-borderless align-middle" id="tabelaUsuarios">
+          <thead>
+            <tr class="table-header-row">
+              <th>#</th>
+              <th>Nome</th>
+              <th>E-mail</th>
+              <th>Tipo</th>
+              <th>Cadastrado em</th>
+              <th class="text-center">Ações</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for u in usuarios %}
+            <tr>
+              <td><span class="badge bg-secondary">{{ u.id }}</span></td>
+              <td>
+                <div class="d-flex align-items-center gap-2">
+                  <div class="user-avatar-sm">
+                    {{ u.nome[0].upper() }}
+                  </div>
+                  <strong>{{ u.nome }}</strong>
+                </div>
+              </td>
+              <td class="text-muted">{{ u.email }}</td>
+              <td>
+                {% if u.tipo_usuario == 'administrador' %}
+                  <span class="badge bg-primary">
+                    <i class="bi bi-shield-fill me-1"></i>Admin
+                  </span>
+                {% else %}
+                  <span class="badge bg-secondary">
+                    <i class="bi bi-person-fill me-1"></i>Cliente
+                  </span>
+                {% endif %}
+              </td>
+              <td class="text-muted small">{{ u.data_criacao.strftime('%d/%m/%Y %H:%M') }}</td>
+              <td class="text-center">
+                <div class="d-flex gap-2 justify-content-center">
+                  <!-- Botão Editar -->
+                  <a href="{{ url_for('users.editar_usuario', id=u.id) }}"
+                     class="btn btn-sm btn-outline-warning"
+                     title="Editar usuário">
+                    <i class="bi bi-pencil-fill"></i>
+                  </a>
+                  <!-- Botão Excluir (não aparece para a própria conta) -->
+                  {% if u.id != current_user.id %}
+                  <button class="btn btn-sm btn-outline-danger"
+                          onclick="confirmarExclusao('{{ url_for('users.excluir_usuario', id=u.id) }}', '{{ u.nome }}')"
+                          title="Excluir usuário">
+                    <i class="bi bi-trash-fill"></i>
+                  </button>
+                  {% else %}
+                  <button class="btn btn-sm btn-outline-secondary" disabled title="Sua própria conta">
+                    <i class="bi bi-trash-fill"></i>
+                  </button>
+                  {% endif %}
+                </div>
+              </td>
+            </tr>
+            {% else %}
+            <tr>
+              <td colspan="6" class="text-center text-muted py-4">
+                <i class="bi bi-inbox display-6 d-block mb-2"></i>
+                Nenhum usuário encontrado.
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Botão voltar -->
+    <div class="mt-3">
+      <a href="{{ url_for('users.dashboard') }}" class="btn btn-outline-secondary btn-sm">
+        <i class="bi bi-arrow-left me-1"></i>Voltar ao Dashboard
+      </a>
+    </div>
+
+  </div>
+</div>
+
+<!-- Modal de confirmação de exclusão -->
+<div class="modal fade" id="modalExclusao" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content bg-dark border-danger">
+      <div class="modal-header border-danger">
+        <h5 class="modal-title text-danger">
+          <i class="bi bi-exclamation-triangle-fill me-2"></i>Confirmar Exclusão
+        </h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <p>Deseja realmente excluir o usuário <strong id="nomeExcluir"></strong>?</p>
+        <p class="text-muted small mb-0">Esta ação não pode ser desfeita.</p>
+      </div>
+      <div class="modal-footer border-secondary">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+        <form id="formExcluir" method="POST">
+          <button type="submit" class="btn btn-danger">
+            <i class="bi bi-trash-fill me-2"></i>Excluir
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
