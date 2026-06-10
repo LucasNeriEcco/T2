@@ -17,7 +17,7 @@ class Usuario(UserMixin, db.Model):
         default="cliente"
     )
     
-    # Campos exclusivos para Booster
+                                    
     status_booster = db.Column(db.Enum('pendente', 'aprovado'), nullable=True)
     nickname = db.Column(db.String(100), nullable=True)
     jogos_atuacao = db.Column(db.String(255), nullable=True)
@@ -26,7 +26,7 @@ class Usuario(UserMixin, db.Model):
     
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
-    # Relacionamentos
+                     
     servicos = db.relationship('Servico', backref='booster', lazy=True, cascade="all, delete-orphan")
     contratacoes_como_cliente = db.relationship('Contratacao', foreign_keys='Contratacao.cliente_id', backref='cliente', lazy=True)
     contratacoes_como_booster = db.relationship('Contratacao', foreign_keys='Contratacao.booster_id', backref='booster_contratado', lazy=True)
@@ -61,7 +61,7 @@ class Servico(db.Model):
     status = db.Column(db.Enum('Ativo', 'Inativo'), nullable=False, default='Ativo')
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
-    # Relacionamentos
+                     
     contratacoes = db.relationship('Contratacao', foreign_keys='Contratacao.servico_id', backref='servico_obj', lazy=True, cascade="all, delete-orphan")
 
     def __repr__(self):

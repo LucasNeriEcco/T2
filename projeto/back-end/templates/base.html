@@ -22,12 +22,6 @@
       </button>
       <div class="collapse navbar-collapse" id="navbarMain">
         <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-          <li class="nav-item">
-            <a class="nav-link {% if request.endpoint == 'services.listar_servicos' %}active{% endif %}"
-               href="{{ url_for('services.listar_servicos') }}">
-              <i class="bi bi-grid-fill me-1"></i>Serviços
-            </a>
-          </li>
           {% if current_user.is_authenticated and current_user.tipo_usuario == 'cliente' %}
           <li class="nav-item">
             <a class="nav-link {% if request.endpoint == 'contratacoes.minhas_contratacoes' %}active{% endif %}"
@@ -142,7 +136,7 @@
     <div class="container text-center">
       <p class="mb-1 text-muted">
         <i class="bi bi-shield-fill-check text-primary me-2"></i>
-        <strong class="text-light">BoostPro</strong> &copy; {{ 2024 }} – Todos os direitos reservados.
+        <strong class="text-light">BoostPro</strong> &copy; {{ 2026 }} – Todos os direitos reservados.
       </p>
       <p class="mb-0 small text-muted">Serviços de rank boosting e account leveling para jogos online.</p>
     </div>

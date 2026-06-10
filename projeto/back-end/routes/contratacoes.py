@@ -17,7 +17,7 @@ def booster_or_admin_required(f):
         return redirect(url_for("auth.login"))
     return decorated_function
 
-# --- Rota do Cliente ---
+                         
 
 @contratacoes_bp.route("/servico/<int:id>/contratar", methods=["GET", "POST"])
 @login_required
@@ -31,7 +31,7 @@ def contratar(id):
         flash("Este serviço não está mais ativo.", "danger")
         return redirect(url_for("services.listar_servicos"))
 
-    # Checar limite de pedidos do serviço
+                                         
     pedidos_ativos = Contratacao.query.filter_by(servico_id=servico.id).filter(Contratacao.status.in_(['Pendente', 'Em andamento'])).count()
     if pedidos_ativos >= servico.max_pedidos_simultaneos:
         flash("Este serviço já atingiu o limite de pedidos simultâneos no momento.", "warning")
@@ -68,7 +68,7 @@ def minhas_contratacoes():
     return render_template("minhas_contratacoes.html", contratacoes=contratacoes)
 
 
-# --- Rota do Admin e Booster ---
+                                 
 
 @contratacoes_bp.route("/painel/pedidos")
 @login_required
@@ -89,7 +89,7 @@ def gerenciar_pedidos():
 def atualizar_status(id):
     contratacao = Contratacao.query.get_or_404(id)
     
-    # Restrição: Apenas admin ou o booster do pedido
+                                                    
     if not current_user.is_admin() and contratacao.booster_id != current_user.id:
         abort(403)
         

@@ -1,7 +1,7 @@
 from flask_wtf import FlaskForm
 from wtforms import (
     StringField, PasswordField, SelectField,
-    TextAreaField, DecimalField, IntegerField, SubmitField
+    TextAreaField, DecimalField, IntegerField, SubmitField, BooleanField
 )
 from wtforms.validators import (
     DataRequired, Email, EqualTo, Length,
@@ -47,6 +47,10 @@ class FormCadastro(FlaskForm):
     discord = StringField(
         "Discord ou outro contato",
         validators=[Optional(), Length(max=100)]
+    )
+    termos = BooleanField(
+        "Eu concordo com os Termos e Condições de Uso",
+        validators=[DataRequired(message="Você deve aceitar os termos de uso para se cadastrar.")]
     )
     submit = SubmitField("Cadastrar")
 class FormLogin(FlaskForm):

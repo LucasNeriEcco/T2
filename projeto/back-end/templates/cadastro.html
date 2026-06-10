@@ -15,7 +15,6 @@
           </div>
           <form method="POST" action="{{ url_for('auth.cadastro') }}" novalidate id="formCadastro">
             {{ form.hidden_tag() }}
-            
             <div class="mb-4">
               <label class="form-label fw-bold text-info">{{ form.tipo_usuario.label.text }}</label>
               {{ form.tipo_usuario(class="form-select form-control-dark border-info", id="tipo_usuario") }}
@@ -23,9 +22,7 @@
                 <div class="invalid-feedback d-block">{{ erro }}</div>
               {% endfor %}
             </div>
-
             <hr class="border-secondary mb-4">
-
             <div class="row g-3">
               <div class="col-md-6 mb-3">
                 <label for="nome" class="form-label">{{ form.nome.label.text }}</label>
@@ -50,7 +47,6 @@
                 {% endfor %}
               </div>
             </div>
-
             <div class="row g-3">
               <div class="col-md-6 mb-3">
                 <label for="senha" class="form-label">{{ form.senha.label.text }}</label>
@@ -81,12 +77,9 @@
                 {% endfor %}
               </div>
             </div>
-
-            <!-- Campos Condicionais para Booster -->
             <div id="boosterFields" style="display: none;">
               <hr class="border-secondary mb-4">
               <h5 class="text-info mb-3"><i class="bi bi-rocket-takeoff-fill me-2"></i>Informações de Booster</h5>
-              
               <div class="row g-3 mb-3">
                 <div class="col-md-6">
                   <label class="form-label">{{ form.nickname.label.text }}</label>
@@ -103,29 +96,27 @@
                   </div>
                 </div>
               </div>
-
               <div class="mb-3">
                 <label class="form-label">{{ form.jogos_atuacao.label.text }}</label>
                 {{ form.jogos_atuacao(class="form-control form-control-dark" + (" is-invalid" if form.jogos_atuacao.errors else ""), placeholder="Ex: LoL, Valorant, CS2") }}
               </div>
-
               <div class="mb-4">
                 <label class="form-label">{{ form.descricao_profissional.label.text }}</label>
                 {{ form.descricao_profissional(class="form-control form-control-dark" + (" is-invalid" if form.descricao_profissional.errors else ""), rows="3", placeholder="Fale sobre sua experiência...") }}
               </div>
-              
               <div class="alert alert-warning small">
                 <i class="bi bi-info-circle me-1"></i> Após o cadastro, seu perfil de Booster passará por uma análise pela administração antes de ser ativado.
               </div>
             </div>
-
-            <div class="form-check mb-4 mt-2">
-              <input class="form-check-input" type="checkbox" value="" id="termos" required>
-              <label class="form-check-label text-muted small" for="termos">
-                Eu concordo com os <a href="#" class="text-info">Termos de Serviço</a> e a Política de Privacidade.
+            <div class="mb-4 form-check">
+              {{ form.termos(class="form-check-input bg-dark border-secondary" + (" is-invalid" if form.termos.errors else "")) }}
+              <label class="form-check-label text-muted small" for="{{ form.termos.id }}">
+                {{ form.termos.label.text }}
               </label>
+              {% for erro in form.termos.errors %}
+                <div class="invalid-feedback d-block">{{ erro }}</div>
+              {% endfor %}
             </div>
-
             {{ form.submit(class="btn btn-primary w-100 btn-lg", id="btnCadastrar") }}
           </form>
           <div class="auth-card-footer text-center mt-4">
@@ -140,13 +131,11 @@
   </div>
 </div>
 {% endblock %}
-
 {% block scripts %}
 <script>
   document.addEventListener("DOMContentLoaded", function() {
     const tipoUsuario = document.getElementById("tipo_usuario");
     const boosterFields = document.getElementById("boosterFields");
-
     function toggleBoosterFields() {
       if (tipoUsuario.value === "booster") {
         boosterFields.style.display = "block";
@@ -154,10 +143,8 @@
         boosterFields.style.display = "none";
       }
     }
-
     // Inicializar no carregamento da página
     toggleBoosterFields();
-
     // Adicionar listener para mudanças
     tipoUsuario.addEventListener("change", toggleBoosterFields);
   });

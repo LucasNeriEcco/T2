@@ -1,20 +1,20 @@
 :root {
-  --clr-bg:           #0a0b0f;
-  --clr-bg-2:         #111318;
-  --clr-bg-3:         #181b24;
-  --clr-surface:      #1c1f2e;
-  --clr-surface-2:    #252940;
-  --clr-border:       #2a2d3e;
-  --clr-border-2:     #3a3d52;
-  --clr-primary:      #3d7eff;
-  --clr-primary-dark: #2563eb;
-  --clr-primary-glow: rgba(61, 126, 255, 0.25);
-  --clr-text:         #e8eaf0;
-  --clr-text-muted:   #8b8fa8;
+  --clr-bg:           #000000;
+  --clr-bg-2:         #050505;
+  --clr-bg-3:         #0a0a0a;
+  --clr-surface:      #121212;
+  --clr-surface-2:    #1a1a1a;
+  --clr-border:       #262626;
+  --clr-border-2:     #333333;
+  --clr-primary:      #ffffff;
+  --clr-primary-dark: #e5e5e5;
+  --clr-primary-glow: rgba(255, 255, 255, 0.05);
+  --clr-text:         #f5f5f5;
+  --clr-text-muted:   #8a8a8a;
   --clr-success:      #22c55e;
   --clr-danger:       #ef4444;
   --clr-warning:      #f59e0b;
-  --clr-info:         #06b6d4;
+  --clr-info:         #d4d4d4;
   --font-body:   'Inter', sans-serif;
   --font-title:  'Rajdhani', sans-serif;
   --radius-sm:  6px;
@@ -107,8 +107,8 @@ body {
   background: linear-gradient(
     160deg,
     var(--clr-bg) 0%,
-    #0d0f1a 40%,
-    #0a1540 100%
+    #050505 40%,
+    #0a0a0a 100%
   );
 }
 .hero-section::before {
@@ -138,7 +138,7 @@ body {
   align-items: center;
   background: var(--clr-primary-glow);
   color: var(--clr-primary);
-  border: 1px solid rgba(61, 126, 255, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   padding: 6px 18px;
   border-radius: 100px;
   font-size: 0.85rem;
@@ -160,7 +160,7 @@ body {
   z-index: 1;
 }
 .text-gradient {
-  background: linear-gradient(135deg, var(--clr-primary), #7db3ff);
+  background: linear-gradient(135deg, #ffffff, #a3a3a3);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -240,7 +240,7 @@ body {
 }
 .feature-card:hover .feature-icon {
   background: var(--clr-primary);
-  color: #fff;
+  color: #000;
   box-shadow: 0 8px 20px var(--clr-primary-glow);
 }
 .services-section {
@@ -289,7 +289,7 @@ body {
 }
 .game-badge {
   background: var(--clr-primary);
-  color: #fff;
+  color: #000;
   font-size: 0.75rem;
   font-weight: 700;
   padding: 4px 12px;
@@ -300,7 +300,7 @@ body {
 .game-badge-sm {
   background: var(--clr-primary-glow);
   color: var(--clr-primary);
-  border: 1px solid rgba(61, 126, 255, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   font-size: 0.75rem;
   font-weight: 700;
   padding: 3px 10px;
@@ -345,8 +345,8 @@ body {
   min-height: calc(100vh - 72px - 80px);
   padding: 40px 0;
   background:
-    radial-gradient(ellipse at 20% 50%, rgba(61, 126, 255, 0.08) 0%, transparent 60%),
-    radial-gradient(ellipse at 80% 20%, rgba(61, 126, 255, 0.05) 0%, transparent 50%),
+    radial-gradient(ellipse at 20% 50%, rgba(255, 255, 255, 0.02) 0%, transparent 60%),
+    radial-gradient(ellipse at 80% 20%, rgba(255, 255, 255, 0.01) 0%, transparent 50%),
     var(--clr-bg);
 }
 .auth-card {
@@ -368,7 +368,7 @@ body {
   font-size: 2rem;
   color: var(--clr-primary);
   margin: 0 auto;
-  border: 2px solid rgba(61, 126, 255, 0.3);
+  border: 2px solid rgba(255, 255, 255, 0.1);
 }
 .auth-title {
   font-family: var(--font-title);
@@ -505,7 +505,7 @@ body {
   justify-content: center;
   font-size: 0.85rem;
   font-weight: 700;
-  color: #fff;
+  color: #000;
   flex-shrink: 0;
 }
 .admin-form-card {
@@ -527,10 +527,12 @@ body {
 .btn-primary {
   background: var(--clr-primary) !important;
   border-color: var(--clr-primary) !important;
+  color: #000 !important;
 }
 .btn-primary:hover {
   background: var(--clr-primary-dark) !important;
   border-color: var(--clr-primary-dark) !important;
+  color: #000 !important;
   box-shadow: 0 4px 16px var(--clr-primary-glow);
   transform: translateY(-1px);
 }
@@ -540,7 +542,7 @@ body {
 }
 .btn-outline-primary:hover {
   background: var(--clr-primary) !important;
-  color: #fff !important;
+  color: #000 !important;
 }
 .btn-lg {
   padding: 12px 28px;
@@ -572,3 +574,11 @@ body {
 @media (max-width: 768px) {
   .page-title { font-size: 1.6rem; }
 }
+
+
+.text-primary { color: var(--clr-primary) !important; }
+.text-info { color: var(--clr-info) !important; }
+.bg-primary { background-color: var(--clr-primary) !important; color: #000 !important; }
+.bg-info { background-color: var(--clr-info) !important; color: #000 !important; }
+.border-primary { border-color: var(--clr-primary) !important; }
+.border-info { border-color: var(--clr-info) !important; }

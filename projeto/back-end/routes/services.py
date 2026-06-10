@@ -67,7 +67,7 @@ def novo_servico():
 def editar_servico(id):
     servico = Servico.query.get_or_404(id)
     
-    # Restrição de propriedade
+                              
     if not current_user.is_admin() and servico.booster_id != current_user.id:
         abort(403)
         
@@ -95,7 +95,7 @@ def excluir_servico(id):
     if not current_user.is_admin() and servico.booster_id != current_user.id:
         abort(403)
         
-    # Impedir exclusão se houver pedidos ativos
+                                               
     pedidos_ativos = [c for c in servico.contratacoes if c.status in ('Pendente', 'Em andamento')]
     if pedidos_ativos:
         flash("Não é possível excluir um serviço que possui pedidos em andamento ou pendentes.", "danger")
