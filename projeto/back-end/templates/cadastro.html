@@ -1,14 +1,11 @@
 {% extends "base.html" %}
 {% block title %}Criar Conta – BoostPro{% endblock %}
-
 {% block content %}
-<div class="auth-page d-flex align-items-center justify-content-center">
+<div class="auth-page d-flex align-items-center justify-content-center py-5 mt-5">
   <div class="container">
     <div class="row justify-content-center">
-      <div class="col-12 col-sm-10 col-md-7 col-lg-5">
-
+      <div class="col-12 col-md-8 col-lg-6">
         <div class="auth-card">
-          <!-- Cabeçalho -->
           <div class="auth-card-header text-center">
             <div class="auth-icon mb-3">
               <i class="bi bi-person-plus-fill"></i>
@@ -16,74 +13,121 @@
             <h2 class="auth-title">Criar conta</h2>
             <p class="text-muted small">Junte-se aos melhores boosters do Brasil</p>
           </div>
-
-          <!-- Formulário -->
           <form method="POST" action="{{ url_for('auth.cadastro') }}" novalidate id="formCadastro">
             {{ form.hidden_tag() }}
-
-            <!-- Nome -->
-            <div class="mb-3">
-              <label for="nome" class="form-label">{{ form.nome.label.text }}</label>
-              <div class="input-group input-group-dark">
-                <span class="input-group-text"><i class="bi bi-person-fill"></i></span>
-                {{ form.nome(class="form-control" + (" is-invalid" if form.nome.errors else ""),
-                             id="nome", placeholder="Seu nome completo", autocomplete="name") }}
-              </div>
-              {% for erro in form.nome.errors %}
-                <div class="invalid-feedback d-block">{{ erro }}</div>
-              {% endfor %}
-            </div>
-
-            <!-- E-mail -->
-            <div class="mb-3">
-              <label for="email" class="form-label">{{ form.email.label.text }}</label>
-              <div class="input-group input-group-dark">
-                <span class="input-group-text"><i class="bi bi-envelope-fill"></i></span>
-                {{ form.email(class="form-control" + (" is-invalid" if form.email.errors else ""),
-                              id="email", placeholder="seu@email.com", autocomplete="email") }}
-              </div>
-              {% for erro in form.email.errors %}
-                <div class="invalid-feedback d-block">{{ erro }}</div>
-              {% endfor %}
-            </div>
-
-            <!-- Senha -->
-            <div class="mb-3">
-              <label for="senha" class="form-label">{{ form.senha.label.text }}</label>
-              <div class="input-group input-group-dark">
-                <span class="input-group-text"><i class="bi bi-lock-fill"></i></span>
-                {{ form.senha(class="form-control" + (" is-invalid" if form.senha.errors else ""),
-                              id="senha", placeholder="Mínimo 6 caracteres", autocomplete="new-password") }}
-                <button class="btn btn-dark border-secondary toggle-password" type="button" data-target="senha">
-                  <i class="bi bi-eye-fill"></i>
-                </button>
-              </div>
-              {% for erro in form.senha.errors %}
-                <div class="invalid-feedback d-block">{{ erro }}</div>
-              {% endfor %}
-            </div>
-
-            <!-- Confirmar Senha -->
+            
             <div class="mb-4">
-              <label for="confirmar_senha" class="form-label">{{ form.confirmar_senha.label.text }}</label>
-              <div class="input-group input-group-dark">
-                <span class="input-group-text"><i class="bi bi-lock-fill"></i></span>
-                {{ form.confirmar_senha(class="form-control" + (" is-invalid" if form.confirmar_senha.errors else ""),
-                                        id="confirmar_senha", placeholder="Repita a senha", autocomplete="new-password") }}
-                <button class="btn btn-dark border-secondary toggle-password" type="button" data-target="confirmar_senha">
-                  <i class="bi bi-eye-fill"></i>
-                </button>
-              </div>
-              {% for erro in form.confirmar_senha.errors %}
+              <label class="form-label fw-bold text-info">{{ form.tipo_usuario.label.text }}</label>
+              {{ form.tipo_usuario(class="form-select form-control-dark border-info", id="tipo_usuario") }}
+              {% for erro in form.tipo_usuario.errors %}
                 <div class="invalid-feedback d-block">{{ erro }}</div>
               {% endfor %}
             </div>
 
-            <!-- Botão -->
+            <hr class="border-secondary mb-4">
+
+            <div class="row g-3">
+              <div class="col-md-6 mb-3">
+                <label for="nome" class="form-label">{{ form.nome.label.text }}</label>
+                <div class="input-group input-group-dark">
+                  <span class="input-group-text"><i class="bi bi-person-fill"></i></span>
+                  {{ form.nome(class="form-control" + (" is-invalid" if form.nome.errors else ""),
+                               id="nome", placeholder="Seu nome completo", autocomplete="name") }}
+                </div>
+                {% for erro in form.nome.errors %}
+                  <div class="invalid-feedback d-block">{{ erro }}</div>
+                {% endfor %}
+              </div>
+              <div class="col-md-6 mb-3">
+                <label for="email" class="form-label">{{ form.email.label.text }}</label>
+                <div class="input-group input-group-dark">
+                  <span class="input-group-text"><i class="bi bi-envelope-fill"></i></span>
+                  {{ form.email(class="form-control" + (" is-invalid" if form.email.errors else ""),
+                                id="email", placeholder="seu@email.com", autocomplete="email") }}
+                </div>
+                {% for erro in form.email.errors %}
+                  <div class="invalid-feedback d-block">{{ erro }}</div>
+                {% endfor %}
+              </div>
+            </div>
+
+            <div class="row g-3">
+              <div class="col-md-6 mb-3">
+                <label for="senha" class="form-label">{{ form.senha.label.text }}</label>
+                <div class="input-group input-group-dark">
+                  <span class="input-group-text"><i class="bi bi-lock-fill"></i></span>
+                  {{ form.senha(class="form-control" + (" is-invalid" if form.senha.errors else ""),
+                                id="senha", placeholder="Mínimo 6 caracteres", autocomplete="new-password") }}
+                  <button class="btn btn-dark border-secondary toggle-password" type="button" data-target="senha">
+                    <i class="bi bi-eye-fill"></i>
+                  </button>
+                </div>
+                {% for erro in form.senha.errors %}
+                  <div class="invalid-feedback d-block">{{ erro }}</div>
+                {% endfor %}
+              </div>
+              <div class="col-md-6 mb-4">
+                <label for="confirmar_senha" class="form-label">{{ form.confirmar_senha.label.text }}</label>
+                <div class="input-group input-group-dark">
+                  <span class="input-group-text"><i class="bi bi-lock-fill"></i></span>
+                  {{ form.confirmar_senha(class="form-control" + (" is-invalid" if form.confirmar_senha.errors else ""),
+                                          id="confirmar_senha", placeholder="Repita a senha", autocomplete="new-password") }}
+                  <button class="btn btn-dark border-secondary toggle-password" type="button" data-target="confirmar_senha">
+                    <i class="bi bi-eye-fill"></i>
+                  </button>
+                </div>
+                {% for erro in form.confirmar_senha.errors %}
+                  <div class="invalid-feedback d-block">{{ erro }}</div>
+                {% endfor %}
+              </div>
+            </div>
+
+            <!-- Campos Condicionais para Booster -->
+            <div id="boosterFields" style="display: none;">
+              <hr class="border-secondary mb-4">
+              <h5 class="text-info mb-3"><i class="bi bi-rocket-takeoff-fill me-2"></i>Informações de Booster</h5>
+              
+              <div class="row g-3 mb-3">
+                <div class="col-md-6">
+                  <label class="form-label">{{ form.nickname.label.text }}</label>
+                  <div class="input-group input-group-dark">
+                    <span class="input-group-text"><i class="bi bi-controller"></i></span>
+                    {{ form.nickname(class="form-control" + (" is-invalid" if form.nickname.errors else ""), placeholder="Ex: Faker") }}
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">{{ form.discord.label.text }}</label>
+                  <div class="input-group input-group-dark">
+                    <span class="input-group-text"><i class="bi bi-discord"></i></span>
+                    {{ form.discord(class="form-control" + (" is-invalid" if form.discord.errors else ""), placeholder="Ex: usuario#1234") }}
+                  </div>
+                </div>
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label">{{ form.jogos_atuacao.label.text }}</label>
+                {{ form.jogos_atuacao(class="form-control form-control-dark" + (" is-invalid" if form.jogos_atuacao.errors else ""), placeholder="Ex: LoL, Valorant, CS2") }}
+              </div>
+
+              <div class="mb-4">
+                <label class="form-label">{{ form.descricao_profissional.label.text }}</label>
+                {{ form.descricao_profissional(class="form-control form-control-dark" + (" is-invalid" if form.descricao_profissional.errors else ""), rows="3", placeholder="Fale sobre sua experiência...") }}
+              </div>
+              
+              <div class="alert alert-warning small">
+                <i class="bi bi-info-circle me-1"></i> Após o cadastro, seu perfil de Booster passará por uma análise pela administração antes de ser ativado.
+              </div>
+            </div>
+
+            <div class="form-check mb-4 mt-2">
+              <input class="form-check-input" type="checkbox" value="" id="termos" required>
+              <label class="form-check-label text-muted small" for="termos">
+                Eu concordo com os <a href="#" class="text-info">Termos de Serviço</a> e a Política de Privacidade.
+              </label>
+            </div>
+
             {{ form.submit(class="btn btn-primary w-100 btn-lg", id="btnCadastrar") }}
           </form>
-
-          <!-- Rodapé -->
           <div class="auth-card-footer text-center mt-4">
             <p class="text-muted mb-0">
               Já tem conta?
@@ -91,9 +135,31 @@
             </p>
           </div>
         </div>
-
       </div>
     </div>
   </div>
 </div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    const tipoUsuario = document.getElementById("tipo_usuario");
+    const boosterFields = document.getElementById("boosterFields");
+
+    function toggleBoosterFields() {
+      if (tipoUsuario.value === "booster") {
+        boosterFields.style.display = "block";
+      } else {
+        boosterFields.style.display = "none";
+      }
+    }
+
+    // Inicializar no carregamento da página
+    toggleBoosterFields();
+
+    // Adicionar listener para mudanças
+    tipoUsuario.addEventListener("change", toggleBoosterFields);
+  });
+</script>
 {% endblock %}

@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% block title %}Contratar {{ servico.categoria }} – BoostPro{% endblock %}
+
+{% block content %}
+<div class="py-5 mt-5">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-md-8">
+        
+        <div class="card bg-dark text-light border-secondary mb-4">
+          <div class="card-header bg-primary text-white">
+            <h5 class="mb-0"><i class="bi bi-info-circle me-2"></i>Resumo do Serviço</h5>
+          </div>
+          <div class="card-body">
+            <h4 class="text-info">{{ servico.jogo }} - {{ servico.categoria }}</h4>
+            <p>{{ servico.descricao }}</p>
+            <hr class="border-secondary">
+            <div class="d-flex justify-content-between align-items-center">
+              <span><strong>Prazo:</strong> {{ servico.prazo_dias }} dias</span>
+              <span class="fs-4 text-success"><strong>R$ {{ "%.2f"|format(servico.preco|float) }}</strong></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="card bg-dark text-light border-secondary">
+          <div class="card-header bg-secondary text-white">
+            <h5 class="mb-0"><i class="bi bi-file-earmark-text me-2"></i>Detalhes da Contratação</h5>
+          </div>
+          <div class="card-body">
+            <form method="POST">
+              {{ form.hidden_tag() }}
+              <div class="mb-3">
+                <label class="form-label">{{ form.nick_jogador.label.text }}</label>
+                {{ form.nick_jogador(class="form-control form-control-dark" + (" is-invalid" if form.nick_jogador.errors else ""), placeholder="Seu nome no jogo") }}
+                {% for erro in form.nick_jogador.errors %}
+                  <div class="invalid-feedback">{{ erro }}</div>
+                {% endfor %}
+              </div>
+              <div class="row g-3 mb-3">
+                <div class="col-md-6">
+                  <label class="form-label">{{ form.rank_atual.label.text }}</label>
+                  {{ form.rank_atual(class="form-control form-control-dark", placeholder="Ex: Prata 4") }}
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">{{ form.rank_desejado.label.text }}</label>
+                  {{ form.rank_desejado(class="form-control form-control-dark", placeholder="Ex: Ouro 1") }}
+                </div>
+              </div>
+              <div class="mb-3">
+                <label class="form-label">{{ form.observacoes.label.text }}</label>
+                {{ form.observacoes(class="form-control form-control-dark", rows="3", placeholder="Alguma observação importante para o booster?") }}
+              </div>
+              <div class="alert alert-warning small">
+                <i class="bi bi-exclamation-triangle me-1"></i>
+                Ao confirmar a contratação, você concorda com nossos Termos de Serviço. Um administrador entrará em contato para iniciar o processo.
+              </div>
+              <div class="d-grid mt-4">
+                {{ form.submit(class="btn btn-primary btn-lg") }}
+              </div>
+            </form>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

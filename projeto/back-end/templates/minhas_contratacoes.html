@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% block title %}Minhas Contratações – BoostPro{% endblock %}
+
+{% block content %}
+<div class="py-5 mt-5">
+  <div class="container">
+    <div class="d-flex align-items-center justify-content-between mb-4">
+      <div>
+        <h2 class="page-title mb-1"><i class="bi bi-list-check text-primary me-2"></i>Minhas Contratações</h2>
+        <p class="text-muted">Acompanhe o andamento dos seus pedidos.</p>
+      </div>
+    </div>
+
+    <div class="card bg-dark border-secondary">
+      <div class="card-body p-0">
+        <div class="table-responsive">
+          <table class="table table-dark table-hover table-borderless align-middle mb-0">
+            <thead class="border-bottom border-secondary">
+              <tr>
+                <th class="ps-4">Pedido #</th>
+                <th>Serviço</th>
+                <th>Booster</th>
+                <th>Data</th>
+                <th>Valor</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for c in contratacoes %}
+              <tr>
+                <td class="ps-4"><span class="badge bg-secondary">#{{ c.id }}</span></td>
+                <td>
+                  <strong>{{ c.servico_obj.jogo }}</strong><br>
+                  <small class="text-muted">{{ c.servico_obj.categoria }}</small>
+                </td>
+                <td>
+                  <span class="badge bg-dark border text-info"><i class="bi bi-rocket-takeoff-fill me-1"></i> {{ c.booster_contratado.nickname or c.booster_contratado.nome }}</span>
+                </td>
+                <td>{{ c.created_at.strftime('%d/%m/%Y %H:%M') }}</td>
+                <td><strong class="text-success">R$ {{ "%.2f"|format(c.servico_obj.preco|float) }}</strong></td>
+                <td>
+                  {% if c.status == 'Pendente' %}
+                    <span class="badge bg-warning text-dark"><i class="bi bi-hourglass-split me-1"></i>Pendente</span>
+                  {% elif c.status == 'Em andamento' %}
+                    <span class="badge bg-primary"><i class="bi bi-play-circle me-1"></i>Em andamento</span>
+                  {% elif c.status == 'Concluído' %}
+                    <span class="badge bg-success"><i class="bi bi-check-circle me-1"></i>Concluído</span>
+                  {% elif c.status == 'Cancelado' %}
+                    <span class="badge bg-danger"><i class="bi bi-x-circle me-1"></i>Cancelado</span>
+                  {% endif %}
+                </td>
+              </tr>
+              {% else %}
+              <tr>
+                <td colspan="6" class="text-center py-5 text-muted">
+                  <i class="bi bi-emoji-frown display-4 d-block mb-3"></i>
+                  Você ainda não possui contratações.<br>
+                  <a href="{{ url_for('services.listar_servicos') }}" class="btn btn-outline-primary mt-3">Ver Serviços</a>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+{% endblock %}

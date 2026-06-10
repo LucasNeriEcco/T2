@@ -1,15 +1,11 @@
 {% extends "base.html" %}
 {% block title %}Login – BoostPro{% endblock %}
-
 {% block content %}
 <div class="auth-page d-flex align-items-center justify-content-center">
   <div class="container">
     <div class="row justify-content-center">
       <div class="col-12 col-sm-10 col-md-7 col-lg-5">
-
-        <!-- Card de login -->
         <div class="auth-card">
-          <!-- Cabeçalho -->
           <div class="auth-card-header text-center">
             <div class="auth-icon mb-3">
               <i class="bi bi-shield-lock-fill"></i>
@@ -17,12 +13,8 @@
             <h2 class="auth-title">Entrar na conta</h2>
             <p class="text-muted small">Acesse seus serviços de boosting</p>
           </div>
-
-          <!-- Formulário -->
           <form method="POST" action="{{ url_for('auth.login') }}" novalidate id="formLogin">
             {{ form.hidden_tag() }}
-
-            <!-- E-mail -->
             <div class="mb-3">
               <label for="email" class="form-label">{{ form.email.label.text }}</label>
               <div class="input-group input-group-dark">
@@ -34,8 +26,6 @@
                 <div class="invalid-feedback d-block">{{ erro }}</div>
               {% endfor %}
             </div>
-
-            <!-- Senha -->
             <div class="mb-4">
               <label for="senha" class="form-label">{{ form.senha.label.text }}</label>
               <div class="input-group input-group-dark">
@@ -50,12 +40,8 @@
                 <div class="invalid-feedback d-block">{{ erro }}</div>
               {% endfor %}
             </div>
-
-            <!-- Botão -->
             {{ form.submit(class="btn btn-primary w-100 btn-lg", id="btnLogin") }}
           </form>
-
-          <!-- Rodapé do card -->
           <div class="auth-card-footer text-center mt-4">
             <p class="text-muted mb-0">
               Não tem uma conta?
@@ -63,7 +49,6 @@
             </p>
           </div>
         </div>
-
       </div>
     </div>
   </div>

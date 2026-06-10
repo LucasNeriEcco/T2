@@ -1,21 +1,13 @@
-"""
-forms.py – Formulários WTForms para validação de dados no back-end.
-Valida campos de cadastro, login, criação/edição de serviços e usuários.
-"""
-
 from flask_wtf import FlaskForm
 from wtforms import (
     StringField, PasswordField, SelectField,
-    TextAreaField, DecimalField, SubmitField
+    TextAreaField, DecimalField, IntegerField, SubmitField
 )
 from wtforms.validators import (
     DataRequired, Email, EqualTo, Length,
     NumberRange, Optional
 )
-
-
 class FormCadastro(FlaskForm):
-    """Formulário de cadastro de novo usuário."""
     nome = StringField(
         "Nome completo",
         validators=[DataRequired(message="Nome é obrigatório."),
@@ -35,11 +27,29 @@ class FormCadastro(FlaskForm):
         "Confirmar senha",
         validators=[DataRequired(), EqualTo("senha", message="Senhas não coincidem.")]
     )
+    tipo_usuario = SelectField(
+        "Você deseja:",
+        choices=[("cliente", "Quero contratar serviços"), ("booster", "Quero oferecer serviços (Booster)")],
+        validators=[DataRequired()]
+    )
+    nickname = StringField(
+        "Nome de exibição (Nickname)",
+        validators=[Optional(), Length(max=100)]
+    )
+    jogos_atuacao = StringField(
+        "Jogos em que atua (separados por vírgula)",
+        validators=[Optional(), Length(max=255)]
+    )
+    descricao_profissional = TextAreaField(
+        "Breve descrição profissional",
+        validators=[Optional()]
+    )
+    discord = StringField(
+        "Discord ou outro contato",
+        validators=[Optional(), Length(max=100)]
+    )
     submit = SubmitField("Cadastrar")
-
-
 class FormLogin(FlaskForm):
-    """Formulário de login."""
     email = StringField(
         "E-mail",
         validators=[DataRequired(message="E-mail é obrigatório."),
@@ -50,18 +60,20 @@ class FormLogin(FlaskForm):
         validators=[DataRequired(message="Senha é obrigatória.")]
     )
     submit = SubmitField("Entrar")
-
-
 class FormServico(FlaskForm):
-    """Formulário de cadastro/edição de serviço de boosting."""
+    nome = StringField(
+        "Nome do Serviço",
+        validators=[DataRequired(message="Informe o nome."),
+                    Length(max=150)]
+    )
     jogo = StringField(
         "Jogo",
         validators=[DataRequired(message="Informe o jogo."),
                     Length(max=100)]
     )
-    tipo_servico = StringField(
-        "Tipo de serviço",
-        validators=[DataRequired(message="Informe o tipo de serviço."),
+    categoria = StringField(
+        "Categoria",
+        validators=[DataRequired(message="Informe a categoria do serviço."),
                     Length(max=100)]
     )
     descricao = TextAreaField(
@@ -74,16 +86,23 @@ class FormServico(FlaskForm):
                     NumberRange(min=0.01, message="Preço deve ser maior que zero.")],
         places=2
     )
-    prazo_estimado = StringField(
-        "Prazo estimado",
-        validators=[DataRequired(message="Informe o prazo."),
-                    Length(max=50)]
+    prazo_dias = IntegerField(
+        "Prazo estimado (em dias)",
+        validators=[DataRequired(message="Informe o prazo estimado.")]
+    )
+    max_pedidos_simultaneos = IntegerField(
+        "Máx. de pedidos simultâneos",
+        validators=[DataRequired(message="Informe o limite.")],
+        default=1
+    )
+    status = SelectField(
+        "Status do Serviço",
+        choices=[("Ativo", "Ativo"), ("Inativo", "Inativo")],
+        validators=[DataRequired()]
     )
     submit = SubmitField("Salvar")
 
-
 class FormEditarUsuario(FlaskForm):
-    """Formulário de edição de usuário pelo administrador."""
     nome = StringField(
         "Nome completo",
         validators=[DataRequired(message="Nome é obrigatório."),
@@ -104,3 +123,36 @@ class FormEditarUsuario(FlaskForm):
         validators=[Optional(), Length(min=6, message="Senha deve ter no mínimo 6 caracteres.")]
     )
     submit = SubmitField("Salvar alterações")
+
+class FormContratacao(FlaskForm):
+    nick_jogador = StringField(
+        "Nick do jogador",
+        validators=[DataRequired(message="Informe o nick do jogador."),
+                    Length(max=100)]
+    )
+    rank_atual = StringField(
+        "Rank atual",
+        validators=[Optional(), Length(max=50)]
+    )
+    rank_desejado = StringField(
+        "Rank desejado (quando aplicável)",
+        validators=[Optional(), Length(max=50)]
+    )
+    observacoes = TextAreaField(
+        "Informações adicionais / Observações",
+        validators=[Optional()]
+    )
+    submit = SubmitField("Confirmar Contratação")
+
+class FormStatusPedido(FlaskForm):
+    status = SelectField(
+        "Status do Pedido",
+        choices=[
+            ("Pendente", "Pendente"),
+            ("Em andamento", "Em andamento"),
+            ("Concluído", "Concluído"),
+            ("Cancelado", "Cancelado")
+        ],
+        validators=[DataRequired()]
+    )
+    submit = SubmitField("Atualizar Status")
