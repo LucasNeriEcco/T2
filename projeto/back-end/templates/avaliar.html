@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}Avaliar Vendedor – BoostPro{% endblock %}
+{% block content %}
+<div class="auth-page d-flex align-items-center justify-content-center py-5 mt-5">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-12 col-md-6 col-lg-5">
+        <div class="auth-card">
+          <div class="auth-card-header text-center">
+            <div class="auth-icon mb-3">
+              <i class="bi bi-star-fill text-warning"></i>
+            </div>
+            <h2 class="auth-title">Avaliar Vendedor</h2>
+            <p class="text-muted small">Pedido #{{ pedido.id_pedido }} – {{ pedido.vendedor.nome }}</p>
+          </div>
+          <form method="POST" novalidate>
+            {{ form.hidden_tag() }}
+            <div class="mb-3">
+              <label class="form-label">{{ form.nota.label.text }}</label>
+              {{ form.nota(class="form-control form-control-dark" + (" is-invalid" if form.nota.errors else ""), placeholder="1 a 5") }}
+              {% for erro in form.nota.errors %}
+                <div class="invalid-feedback d-block">{{ erro }}</div>
+              {% endfor %}
+            </div>
+            <div class="mb-4">
+              <label class="form-label">{{ form.comentario.label.text }}</label>
+              {{ form.comentario(class="form-control form-control-dark", rows="3", placeholder="Deixe um comentário sobre o serviço...") }}
+            </div>
+            {{ form.submit(class="btn btn-warning w-100 btn-lg text-dark") }}
+          </form>
+          <div class="auth-card-footer text-center mt-4">
+            <a href="{{ url_for('contratacoes.meus_pedidos') }}" class="text-muted">
+              <i class="bi bi-arrow-left me-1"></i>Voltar aos pedidos
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

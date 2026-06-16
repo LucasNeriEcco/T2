@@ -13,7 +13,7 @@
 <body>
   <nav class="navbar navbar-expand-lg navbar-dark fixed-top" id="mainNav">
     <div class="container">
-      <a class="navbar-brand d-flex align-items-center gap-2" href="{{ url_for('services.listar_servicos') }}">
+      <a class="navbar-brand d-flex align-items-center gap-2" href="{{ url_for('services.listar_vendedores') }}">
         <i class="bi bi-shield-fill-check text-primary fs-4"></i>
         <span class="brand-text">Boost<span class="text-primary">Pro</span></span>
       </a>
@@ -22,64 +22,26 @@
       </button>
       <div class="collapse navbar-collapse" id="navbarMain">
         <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-          {% if current_user.is_authenticated and current_user.tipo_usuario == 'cliente' %}
           <li class="nav-item">
-            <a class="nav-link {% if request.endpoint == 'contratacoes.minhas_contratacoes' %}active{% endif %}"
-               href="{{ url_for('contratacoes.minhas_contratacoes') }}">
-              <i class="bi bi-list-check me-1"></i>Minhas Contratações
+            <a class="nav-link {% if request.endpoint == 'services.listar_vendedores' %}active{% endif %}"
+               href="{{ url_for('services.listar_vendedores') }}">
+              <i class="bi bi-shop me-1"></i>Vendedores
+            </a>
+          </li>
+          {% if current_user.is_authenticated and current_user.tipo_usuario == 'comprador' %}
+          <li class="nav-item">
+            <a class="nav-link {% if request.endpoint == 'contratacoes.meus_pedidos' %}active{% endif %}"
+               href="{{ url_for('contratacoes.meus_pedidos') }}">
+              <i class="bi bi-list-check me-1"></i>Meus Pedidos
             </a>
           </li>
           {% endif %}
-          {% if current_user.is_authenticated and current_user.tipo_usuario == 'booster' %}
-          <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">
-              <i class="bi bi-rocket-takeoff-fill me-1"></i>Booster
+          {% if current_user.is_authenticated and current_user.tipo_usuario == 'vendedor' %}
+          <li class="nav-item">
+            <a class="nav-link {% if request.endpoint == 'services.meus_pedidos_vendedor' %}active{% endif %}"
+               href="{{ url_for('services.meus_pedidos_vendedor') }}">
+              <i class="bi bi-bag-check-fill me-1"></i>Pedidos Recebidos
             </a>
-            <ul class="dropdown-menu dropdown-menu-dark">
-              <li>
-                <a class="dropdown-item" href="{{ url_for('services.gerenciar_servicos') }}">
-                  <i class="bi bi-controller me-2"></i>Meus Serviços
-                </a>
-              </li>
-              <li>
-                <a class="dropdown-item" href="{{ url_for('contratacoes.gerenciar_pedidos') }}">
-                  <i class="bi bi-bag-check-fill me-2"></i>Pedidos Recebidos
-                </a>
-              </li>
-            </ul>
-          </li>
-          {% endif %}
-          {% if current_user.is_authenticated and current_user.is_admin() %}
-          <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">
-              <i class="bi bi-gear-fill me-1"></i>Admin
-            </a>
-            <ul class="dropdown-menu dropdown-menu-dark">
-              <li>
-                <a class="dropdown-item" href="{{ url_for('users.dashboard') }}">
-                  <i class="bi bi-speedometer2 me-2"></i>Dashboard
-                </a>
-              </li>
-              <li><hr class="dropdown-divider" /></li>
-              <li><a class="dropdown-item" href="{{ url_for('users.listar_boosters_pendentes') }}"><i class="bi bi-person-badge-fill me-2"></i>Aprovar Boosters</a></li>
-              <li><hr class="dropdown-divider"></li>
-              <li><a class="dropdown-item text-danger" href="{{ url_for('db_admin.query_panel') }}"><i class="bi bi-database-fill-gear me-2"></i>Painel MySQL</a></li>
-              <li>
-                <a class="dropdown-item" href="{{ url_for('users.listar_usuarios') }}">
-                  <i class="bi bi-people-fill me-2"></i>Gerenciar Usuários
-                </a>
-              </li>
-              <li>
-                <a class="dropdown-item" href="{{ url_for('services.gerenciar_servicos') }}">
-                  <i class="bi bi-controller me-2"></i>Todos Serviços
-                </a>
-              </li>
-              <li>
-                <a class="dropdown-item" href="{{ url_for('contratacoes.gerenciar_pedidos') }}">
-                  <i class="bi bi-bag-check-fill me-2"></i>Todos Pedidos
-                </a>
-              </li>
-            </ul>
           </li>
           {% endif %}
         </ul>
@@ -88,10 +50,10 @@
             <li class="nav-item">
               <span class="nav-link text-light-emphasis">
                 <i class="bi bi-person-circle me-1"></i>{{ current_user.nome }}
-                {% if current_user.is_admin() %}
-                  <span class="badge bg-primary ms-1">Admin</span>
-                {% elif current_user.tipo_usuario == 'booster' %}
-                  <span class="badge bg-info text-dark ms-1">Booster</span>
+                {% if current_user.tipo_usuario == 'vendedor' %}
+                  <span class="badge bg-info text-dark ms-1">Vendedor</span>
+                {% else %}
+                  <span class="badge bg-success ms-1">Comprador</span>
                 {% endif %}
               </span>
             </li>
@@ -136,7 +98,7 @@
     <div class="container text-center">
       <p class="mb-1 text-muted">
         <i class="bi bi-shield-fill-check text-primary me-2"></i>
-        <strong class="text-light">BoostPro</strong> &copy; {{ 2026 }} – Todos os direitos reservados.
+        <strong class="text-light">BoostPro</strong> &copy; 2026 – Todos os direitos reservados.
       </p>
       <p class="mb-0 small text-muted">Serviços de rank boosting e account leveling para jogos online.</p>
     </div>

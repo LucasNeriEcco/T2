@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% block title %}Mensagens – Pedido #{{ pedido.id_pedido }} – BoostPro{% endblock %}
+{% block content %}
+<div class="container py-5 mt-5">
+  <div class="row justify-content-center">
+    <div class="col-12 col-lg-8">
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2><i class="bi bi-chat-dots me-2 text-primary"></i>Mensagens – Pedido #{{ pedido.id_pedido }}</h2>
+        <a href="javascript:history.back()" class="btn btn-outline-light btn-sm">
+          <i class="bi bi-arrow-left me-1"></i>Voltar
+        </a>
+      </div>
+      <div class="card bg-dark border-secondary mb-4">
+        <div class="card-body" style="max-height: 400px; overflow-y: auto;" id="chatBox">
+          {% if mensagens %}
+            {% for m in mensagens %}
+            <div class="mb-3 {% if m.remetente == current_user.id_usuario %}text-end{% endif %}">
+              <div class="d-inline-block p-3 rounded-3 {% if m.remetente == current_user.id_usuario %}bg-primary text-white{% else %}bg-secondary text-white{% endif %}" style="max-width: 75%;">
+                <p class="mb-1">{{ m.mensagem }}</p>
+                <small class="opacity-75">
+                  {{ m.remetente_usuario.nome }} – {{ m.data_envio.strftime('%d/%m/%Y %H:%M') if m.data_envio else '' }}
+                </small>
+              </div>
+            </div>
+            {% endfor %}
+          {% else %}
+            <div class="text-center text-muted py-4">
+              <i class="bi bi-chat display-4"></i>
+              <p class="mt-2">Nenhuma mensagem ainda. Inicie a conversa!</p>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+      <form method="POST" novalidate>
+        {{ form.hidden_tag() }}
+        <div class="input-group input-group-dark">
+          {{ form.mensagem(class="form-control" + (" is-invalid" if form.mensagem.errors else ""), placeholder="Digite sua mensagem...", rows="2") }}
+          {{ form.submit(class="btn btn-primary") }}
+        </div>
+        {% for erro in form.mensagem.errors %}
+          <div class="invalid-feedback d-block">{{ erro }}</div>
+        {% endfor %}
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    const chatBox = document.getElementById("chatBox");
+    if (chatBox) chatBox.scrollTop = chatBox.scrollHeight;
+  });
+</script>
+{% endblock %}

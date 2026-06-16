@@ -1,103 +1,75 @@
-from flask import Blueprint, render_template, redirect, url_for, flash, request, abort
+from flask import Blueprint, render_template, redirect, url_for, flash
 from flask_login import login_required, current_user
-from models import db, Servico, Contratacao
-from forms import FormContratacao, FormStatusPedido
-from functools import wraps
+from models import db, Pedido, Avaliacao, Mensagem
+from forms import FormMensagem, FormAvaliacao
 
 contratacoes_bp = Blueprint("contratacoes", __name__)
 
-def booster_or_admin_required(f):
-    @wraps(f)
-    def decorated_function(*args, **kwargs):
-        if not current_user.is_authenticated:
-            return redirect(url_for("auth.login"))
-        if current_user.is_admin() or current_user.tipo_usuario == "booster":
-            return f(*args, **kwargs)
-        flash("Acesso restrito.", "danger")
-        return redirect(url_for("auth.login"))
-    return decorated_function
-
-                         
-
-@contratacoes_bp.route("/servico/<int:id>/contratar", methods=["GET", "POST"])
+@contratacoes_bp.route("/meus-pedidos")
 @login_required
-def contratar(id):
-    if current_user.tipo_usuario != "cliente":
-        flash("Apenas clientes podem contratar serviços.", "warning")
-        return redirect(url_for("services.listar_servicos"))
-        
-    servico = Servico.query.get_or_404(id)
-    if servico.status != "Ativo":
-        flash("Este serviço não está mais ativo.", "danger")
-        return redirect(url_for("services.listar_servicos"))
+def meus_pedidos():
+    if current_user.tipo_usuario != "comprador":
+        return redirect(url_for("services.meus_pedidos_vendedor"))
 
-                                         
-    pedidos_ativos = Contratacao.query.filter_by(servico_id=servico.id).filter(Contratacao.status.in_(['Pendente', 'Em andamento'])).count()
-    if pedidos_ativos >= servico.max_pedidos_simultaneos:
-        flash("Este serviço já atingiu o limite de pedidos simultâneos no momento.", "warning")
-        return redirect(url_for("services.listar_servicos"))
+    pedidos = Pedido.query.filter_by(id_comprador=current_user.id_usuario).order_by(Pedido.created_at.desc()).all()
+    return render_template("minhas_contratacoes.html", pedidos=pedidos)
 
-    form = FormContratacao()
+@contratacoes_bp.route("/pedido/<int:id>/mensagens", methods=["GET", "POST"])
+@login_required
+def mensagens_pedido(id):
+    pedido = Pedido.query.get_or_404(id)
+    if pedido.id_comprador != current_user.id_usuario and pedido.id_vendedor != current_user.id_usuario:
+        flash("Acesso negado.", "danger")
+        return redirect(url_for("contratacoes.meus_pedidos"))
+
+    form = FormMensagem()
     if form.validate_on_submit():
-        contratacao = Contratacao(
-            cliente_id=current_user.id,
-            booster_id=servico.booster_id,
-            servico_id=servico.id,
-            nick_jogador=form.nick_jogador.data,
-            rank_atual=form.rank_atual.data,
-            rank_desejado=form.rank_desejado.data,
-            observacoes=form.observacoes.data
+        if pedido.id_comprador == current_user.id_usuario:
+            dest = pedido.id_vendedor
+        else:
+            dest = pedido.id_comprador
+
+        msg = Mensagem(
+            id_pedido=pedido.id_pedido,
+            remetente=current_user.id_usuario,
+            destinatario=dest,
+            mensagem=form.mensagem.data
         )
-        db.session.add(contratacao)
+        db.session.add(msg)
         db.session.commit()
-        flash("Contratação realizada com sucesso! Acompanhe o status no seu painel.", "success")
-        return redirect(url_for("contratacoes.minhas_contratacoes"))
+        flash("Mensagem enviada!", "success")
+        return redirect(url_for("contratacoes.mensagens_pedido", id=id))
 
-    return render_template("contratar.html", form=form, servico=servico)
+    mensagens = Mensagem.query.filter_by(id_pedido=pedido.id_pedido).order_by(Mensagem.data_envio.asc()).all()
+    return render_template("mensagens.html", pedido=pedido, mensagens=mensagens, form=form)
 
-
-@contratacoes_bp.route("/minhas-contratacoes")
+@contratacoes_bp.route("/pedido/<int:id>/avaliar", methods=["GET", "POST"])
 @login_required
-def minhas_contratacoes():
-    if current_user.tipo_usuario != "cliente":
-        if current_user.is_admin():
-            return redirect(url_for("users.dashboard"))
-        return redirect(url_for("services.gerenciar_servicos"))
-        
-    contratacoes = Contratacao.query.filter_by(cliente_id=current_user.id).order_by(Contratacao.created_at.desc()).all()
-    return render_template("minhas_contratacoes.html", contratacoes=contratacoes)
+def avaliar_pedido(id):
+    pedido = Pedido.query.get_or_404(id)
+    if pedido.id_comprador != current_user.id_usuario:
+        flash("Apenas o comprador pode avaliar.", "danger")
+        return redirect(url_for("contratacoes.meus_pedidos"))
+    if pedido.status != "Concluido":
+        flash("Só é possível avaliar pedidos concluídos.", "warning")
+        return redirect(url_for("contratacoes.meus_pedidos"))
 
+    ja_avaliou = Avaliacao.query.filter_by(id_comprador=current_user.id_usuario, id_vendedor=pedido.id_vendedor).first()
+    if ja_avaliou:
+        flash("Você já avaliou este vendedor.", "info")
+        return redirect(url_for("contratacoes.meus_pedidos"))
 
-                                 
-
-@contratacoes_bp.route("/painel/pedidos")
-@login_required
-@booster_or_admin_required
-def gerenciar_pedidos():
-    if current_user.is_admin():
-        contratacoes = Contratacao.query.order_by(Contratacao.created_at.desc()).all()
-    else:
-        contratacoes = Contratacao.query.filter_by(booster_id=current_user.id).order_by(Contratacao.created_at.desc()).all()
-        
-    forms = {c.id: FormStatusPedido(status=c.status) for c in contratacoes}
-    return render_template("admin_pedidos.html", contratacoes=contratacoes, forms=forms)
-
-
-@contratacoes_bp.route("/painel/pedidos/<int:id>/status", methods=["POST"])
-@login_required
-@booster_or_admin_required
-def atualizar_status(id):
-    contratacao = Contratacao.query.get_or_404(id)
-    
-                                                    
-    if not current_user.is_admin() and contratacao.booster_id != current_user.id:
-        abort(403)
-        
-    form = FormStatusPedido()
+    form = FormAvaliacao()
     if form.validate_on_submit():
-        contratacao.status = form.status.data
+        avaliacao = Avaliacao(
+            id_comprador=current_user.id_usuario,
+            id_vendedor=pedido.id_vendedor,
+            nota=form.nota.data,
+            comentario=form.comentario.data
+        )
+        db.session.add(avaliacao)
         db.session.commit()
-        flash("Status atualizado com sucesso!", "success")
-    else:
-        flash("Erro ao atualizar status.", "danger")
-    return redirect(url_for("contratacoes.gerenciar_pedidos"))
+        flash("Avaliação enviada com sucesso!", "success")
+        return redirect(url_for("contratacoes.meus_pedidos"))
+
+    return render_template("avaliar.html", pedido=pedido, form=form)

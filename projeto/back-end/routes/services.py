@@ -1,107 +1,76 @@
-from flask import Blueprint, render_template, redirect, url_for, flash, request, abort
+from flask import Blueprint, render_template, redirect, url_for, flash, abort
 from flask_login import login_required, current_user
-from models import db, Servico
-from forms import FormServico
+from models import db, Pedido, Vendedor, Usuario
+from forms import FormPedido, FormStatusPedido, FormMensagem
 from functools import wraps
 
 services_bp = Blueprint("services", __name__)
 
-def booster_or_admin_required(f):
+def vendedor_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
         if not current_user.is_authenticated:
             return redirect(url_for("auth.login"))
-        if current_user.is_admin():
+        if current_user.is_vendedor():
             return f(*args, **kwargs)
-        if current_user.tipo_usuario == "booster":
-            if current_user.status_booster != "aprovado":
-                flash("Sua conta de Booster ainda está pendente de aprovação.", "warning")
-                return redirect(url_for("services.listar_servicos"))
-            return f(*args, **kwargs)
-        
-        flash("Acesso restrito a Boosters e Administradores.", "danger")
+        flash("Acesso restrito a vendedores.", "danger")
         return redirect(url_for("auth.login"))
     return decorated_function
 
-@services_bp.route("/servicos")
-def listar_servicos():
-    servicos = Servico.query.filter_by(status="Ativo").all()
-    return render_template("servicos.html", servicos=servicos)
+@services_bp.route("/vendedores")
+def listar_vendedores():
+    vendedores = Vendedor.query.all()
+    return render_template("servicos.html", vendedores=vendedores)
 
-@services_bp.route("/painel/servicos")
+@services_bp.route("/vendedor/<int:id>/contratar", methods=["GET", "POST"])
 @login_required
-@booster_or_admin_required
-def gerenciar_servicos():
-    if current_user.is_admin():
-        servicos = Servico.query.all()
-    else:
-        servicos = Servico.query.filter_by(booster_id=current_user.id).all()
-    return render_template("admin_servicos.html", servicos=servicos)
+def contratar_vendedor(id):
+    if current_user.tipo_usuario != "comprador":
+        flash("Apenas compradores podem contratar serviços.", "warning")
+        return redirect(url_for("services.listar_vendedores"))
 
-@services_bp.route("/painel/servicos/novo", methods=["GET", "POST"])
-@login_required
-@booster_or_admin_required
-def novo_servico():
-    form = FormServico()
+    vendedor_perfil = Vendedor.query.get_or_404(id)
+    vendedor_usuario = vendedor_perfil.usuario
+
+    form = FormPedido()
     if form.validate_on_submit():
-        servico = Servico(
-            booster_id=current_user.id,
-            nome=form.nome.data,
+        pedido = Pedido(
+            id_comprador=current_user.id_usuario,
+            id_vendedor=vendedor_usuario.id_usuario,
             jogo=form.jogo.data,
-            categoria=form.categoria.data,
-            descricao=form.descricao.data,
-            preco=form.preco.data,
-            prazo_dias=form.prazo_dias.data,
-            max_pedidos_simultaneos=form.max_pedidos_simultaneos.data,
-            status=form.status.data
+            servico=form.servico.data,
+            rank_atual=form.rank_atual.data,
+            rank_desejado=form.rank_desejado.data,
+            valor=form.valor.data
         )
-        db.session.add(servico)
+        db.session.add(pedido)
         db.session.commit()
-        flash("Serviço cadastrado com sucesso!", "success")
-        return redirect(url_for("services.gerenciar_servicos"))
-    return render_template("form_servico.html", form=form, titulo="Novo Serviço")
+        flash("Pedido realizado com sucesso! Acompanhe o status no seu painel.", "success")
+        return redirect(url_for("contratacoes.meus_pedidos"))
 
-@services_bp.route("/painel/servicos/editar/<int:id>", methods=["GET", "POST"])
+    return render_template("contratar.html", form=form, vendedor=vendedor_perfil, vendedor_usuario=vendedor_usuario)
+
+@services_bp.route("/painel/pedidos-vendedor")
 @login_required
-@booster_or_admin_required
-def editar_servico(id):
-    servico = Servico.query.get_or_404(id)
-    
-                              
-    if not current_user.is_admin() and servico.booster_id != current_user.id:
+@vendedor_required
+def meus_pedidos_vendedor():
+    pedidos = Pedido.query.filter_by(id_vendedor=current_user.id_usuario).order_by(Pedido.created_at.desc()).all()
+    forms = {p.id_pedido: FormStatusPedido(status=p.status) for p in pedidos}
+    return render_template("admin_pedidos.html", pedidos=pedidos, forms=forms)
+
+@services_bp.route("/painel/pedidos-vendedor/<int:id>/status", methods=["POST"])
+@login_required
+@vendedor_required
+def atualizar_status_vendedor(id):
+    pedido = Pedido.query.get_or_404(id)
+    if pedido.id_vendedor != current_user.id_usuario:
         abort(403)
-        
-    form = FormServico(obj=servico)
+
+    form = FormStatusPedido()
     if form.validate_on_submit():
-        servico.nome = form.nome.data
-        servico.jogo = form.jogo.data
-        servico.categoria = form.categoria.data
-        servico.descricao = form.descricao.data
-        servico.preco = form.preco.data
-        servico.prazo_dias = form.prazo_dias.data
-        servico.max_pedidos_simultaneos = form.max_pedidos_simultaneos.data
-        servico.status = form.status.data
+        pedido.status = form.status.data
         db.session.commit()
-        flash("Serviço atualizado com sucesso!", "success")
-        return redirect(url_for("services.gerenciar_servicos"))
-    return render_template("form_servico.html", form=form, titulo="Editar Serviço", servico=servico)
-
-@services_bp.route("/painel/servicos/excluir/<int:id>", methods=["POST"])
-@login_required
-@booster_or_admin_required
-def excluir_servico(id):
-    servico = Servico.query.get_or_404(id)
-    
-    if not current_user.is_admin() and servico.booster_id != current_user.id:
-        abort(403)
-        
-                                               
-    pedidos_ativos = [c for c in servico.contratacoes if c.status in ('Pendente', 'Em andamento')]
-    if pedidos_ativos:
-        flash("Não é possível excluir um serviço que possui pedidos em andamento ou pendentes.", "danger")
-        return redirect(url_for("services.gerenciar_servicos"))
-        
-    db.session.delete(servico)
-    db.session.commit()
-    flash("Serviço excluído com sucesso.", "warning")
-    return redirect(url_for("services.gerenciar_servicos"))
+        flash("Status atualizado com sucesso!", "success")
+    else:
+        flash("Erro ao atualizar status.", "danger")
+    return redirect(url_for("services.meus_pedidos_vendedor"))

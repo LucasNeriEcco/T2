@@ -7,29 +7,27 @@ db = SQLAlchemy()
 
 class Usuario(UserMixin, db.Model):
     __tablename__ = "usuarios"
-    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    id_usuario = db.Column(db.Integer, primary_key=True, autoincrement=True)
     nome = db.Column(db.String(100), nullable=False)
-    email = db.Column(db.String(150), unique=True, nullable=False)
+    email = db.Column(db.String(100), unique=True, nullable=False)
     senha = db.Column(db.String(256), nullable=False)
     tipo_usuario = db.Column(
-        db.Enum("cliente", "booster", "administrador"),
+        db.Enum("comprador", "vendedor"),
         nullable=False,
-        default="cliente"
+        default="comprador"
     )
-    
-                                    
-    status_booster = db.Column(db.Enum('pendente', 'aprovado'), nullable=True)
-    nickname = db.Column(db.String(100), nullable=True)
-    jogos_atuacao = db.Column(db.String(255), nullable=True)
-    descricao_profissional = db.Column(db.Text, nullable=True)
-    discord = db.Column(db.String(100), nullable=True)
-    
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
-                     
-    servicos = db.relationship('Servico', backref='booster', lazy=True, cascade="all, delete-orphan")
-    contratacoes_como_cliente = db.relationship('Contratacao', foreign_keys='Contratacao.cliente_id', backref='cliente', lazy=True)
-    contratacoes_como_booster = db.relationship('Contratacao', foreign_keys='Contratacao.booster_id', backref='booster_contratado', lazy=True)
+    vendedor_perfil = db.relationship('Vendedor', backref='usuario', uselist=False, lazy=True, cascade="all, delete-orphan")
+    pedidos_como_comprador = db.relationship('Pedido', foreign_keys='Pedido.id_comprador', backref='comprador', lazy=True)
+    pedidos_como_vendedor = db.relationship('Pedido', foreign_keys='Pedido.id_vendedor', backref='vendedor', lazy=True)
+    mensagens_enviadas = db.relationship('Mensagem', foreign_keys='Mensagem.remetente', backref='remetente_usuario', lazy=True)
+    mensagens_recebidas = db.relationship('Mensagem', foreign_keys='Mensagem.destinatario', backref='destinatario_usuario', lazy=True)
+    avaliacoes_como_comprador = db.relationship('Avaliacao', foreign_keys='Avaliacao.id_comprador', backref='comprador_avaliacao', lazy=True)
+    avaliacoes_como_vendedor = db.relationship('Avaliacao', foreign_keys='Avaliacao.id_vendedor', backref='vendedor_avaliacao', lazy=True)
+
+    def get_id(self):
+        return str(self.id_usuario)
 
     def set_senha(self, senha_plana):
         self.senha = generate_password_hash(senha_plana)
@@ -38,55 +36,72 @@ class Usuario(UserMixin, db.Model):
         return check_password_hash(self.senha, senha_plana)
 
     def is_admin(self):
-        return self.tipo_usuario == "administrador"
-        
-    def is_booster_aprovado(self):
-        return self.tipo_usuario == "booster" and self.status_booster == "aprovado"
+        return False
+
+    def is_vendedor(self):
+        return self.tipo_usuario == "vendedor"
 
     def __repr__(self):
         return f"<Usuario {self.email} ({self.tipo_usuario})>"
 
 
-class Servico(db.Model):
-    __tablename__ = "servicos"
-    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    booster_id = db.Column(db.Integer, db.ForeignKey('usuarios.id'), nullable=False)
-    nome = db.Column(db.String(150), nullable=False)
-    jogo = db.Column(db.String(100), nullable=False)
-    categoria = db.Column(db.String(100), nullable=False)
-    descricao = db.Column(db.Text, nullable=True)
-    preco = db.Column(db.Numeric(10, 2), nullable=False)
-    prazo_dias = db.Column(db.Integer, nullable=False)
-    max_pedidos_simultaneos = db.Column(db.Integer, nullable=False, default=1)
-    status = db.Column(db.Enum('Ativo', 'Inativo'), nullable=False, default='Ativo')
+class Vendedor(db.Model):
+    __tablename__ = "vendedores"
+    id_vendedor = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    id_usuario = db.Column(db.Integer, db.ForeignKey('usuarios.id_usuario'), nullable=False)
+    especialidade = db.Column(db.String(100), nullable=True)
+    nota_media = db.Column(db.Numeric(3, 2), nullable=True, default=0.00)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
-                     
-    contratacoes = db.relationship('Contratacao', foreign_keys='Contratacao.servico_id', backref='servico_obj', lazy=True, cascade="all, delete-orphan")
-
     def __repr__(self):
-        return f"<Servico {self.nome} - Booster ID {self.booster_id}>"
+        return f"<Vendedor {self.id_vendedor} - Especialidade: {self.especialidade}>"
 
 
-class Contratacao(db.Model):
-    __tablename__ = "contratacoes"
-    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    cliente_id = db.Column(db.Integer, db.ForeignKey('usuarios.id'), nullable=False)
-    booster_id = db.Column(db.Integer, db.ForeignKey('usuarios.id'), nullable=False)
-    servico_id = db.Column(db.Integer, db.ForeignKey('servicos.id'), nullable=False)
-    
-    nick_jogador = db.Column(db.String(100), nullable=False)
+class Pedido(db.Model):
+    __tablename__ = "pedidos"
+    id_pedido = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    id_comprador = db.Column(db.Integer, db.ForeignKey('usuarios.id_usuario'), nullable=False)
+    id_vendedor = db.Column(db.Integer, db.ForeignKey('usuarios.id_usuario'), nullable=False)
+    jogo = db.Column(db.String(100), nullable=False)
+    servico = db.Column(db.String(100), nullable=False)
     rank_atual = db.Column(db.String(50), nullable=True)
     rank_desejado = db.Column(db.String(50), nullable=True)
-    observacoes = db.Column(db.Text, nullable=True)
-    
+    valor = db.Column(db.Numeric(10, 2), nullable=True)
     status = db.Column(
-        db.Enum('Pendente', 'Em andamento', 'Concluído', 'Cancelado'),
-        nullable=False,
+        db.Enum('Pendente', 'Aceito', 'Em andamento', 'Concluido', 'Cancelado'),
+        nullable=True,
         default='Pendente'
     )
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
+    mensagens = db.relationship('Mensagem', backref='pedido', lazy=True, cascade="all, delete-orphan")
+
     def __repr__(self):
-        return f"<Contratacao {self.id} - {self.status}>"
+        return f"<Pedido {self.id_pedido} - {self.status}>"
+
+
+class Mensagem(db.Model):
+    __tablename__ = "mensagens"
+    id_mensagem = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    id_pedido = db.Column(db.Integer, db.ForeignKey('pedidos.id_pedido'), nullable=False)
+    remetente = db.Column(db.Integer, db.ForeignKey('usuarios.id_usuario'), nullable=False)
+    destinatario = db.Column(db.Integer, db.ForeignKey('usuarios.id_usuario'), nullable=False)
+    mensagem = db.Column(db.Text, nullable=False)
+    data_envio = db.Column(db.DateTime, default=datetime.utcnow)
+
+    def __repr__(self):
+        return f"<Mensagem {self.id_mensagem}>"
+
+
+class Avaliacao(db.Model):
+    __tablename__ = "avaliacoes"
+    id_avaliacao = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    id_comprador = db.Column(db.Integer, db.ForeignKey('usuarios.id_usuario'), nullable=False)
+    id_vendedor = db.Column(db.Integer, db.ForeignKey('usuarios.id_usuario'), nullable=False)
+    nota = db.Column(db.Integer, nullable=False)
+    comentario = db.Column(db.Text, nullable=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    def __repr__(self):
+        return f"<Avaliacao {self.id_avaliacao} - Nota: {self.nota}>"

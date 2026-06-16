@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}Serviços de Boosting – BoostPro{% endblock %}
+{% block title %}Vendedores – BoostPro{% endblock %}
 {% block content %}
 <section class="hero-section text-center">
   <div class="container">
@@ -7,15 +7,15 @@
       <i class="bi bi-lightning-charge-fill me-2"></i>Serviços Premium de Boosting
     </div>
     <h1 class="hero-title">
-      Suba de <span class="text-gradient">Rank</span> com<br />os Melhores Boosters
+      Suba de <span class="text-gradient">Rank</span> com<br />os Melhores Vendedores
     </h1>
     <p class="hero-subtitle">
       Rank boosting e account leveling para os principais jogos online.<br />
       Resultados garantidos, entrega rápida e total segurança.
     </p>
     <div class="d-flex gap-3 justify-content-center flex-wrap">
-      <a href="#servicos" class="btn btn-primary btn-lg px-4">
-        <i class="bi bi-controller me-2"></i>Ver Serviços
+      <a href="#vendedores" class="btn btn-primary btn-lg px-4">
+        <i class="bi bi-shop me-2"></i>Ver Vendedores
       </a>
       {% if not current_user.is_authenticated %}
       <a href="{{ url_for('auth.cadastro') }}" class="btn btn-outline-light btn-lg px-4">
@@ -48,7 +48,7 @@
         <div class="feature-card text-center">
           <div class="feature-icon"><i class="bi bi-shield-check"></i></div>
           <h5>100% Seguro</h5>
-          <p class="text-muted small">Boosters profissionais com acesso seguro à sua conta.</p>
+          <p class="text-muted small">Vendedores verificados com acesso seguro à sua conta.</p>
         </div>
       </div>
       <div class="col-md-4">
@@ -68,42 +68,44 @@
     </div>
   </div>
 </section>
-<section id="servicos" class="services-section py-5">
+<section id="vendedores" class="services-section py-5">
   <div class="container">
     <div class="section-header text-center mb-5">
-      <span class="section-badge">Catálogo</span>
-      <h2 class="section-title mt-2">Nossos Serviços</h2>
-      <p class="text-muted">Escolha o serviço ideal para o seu jogo favorito.</p>
+      <span class="section-badge">Vendedores</span>
+      <h2 class="section-title mt-2">Nossos Vendedores</h2>
+      <p class="text-muted">Escolha o vendedor ideal para o seu jogo favorito.</p>
     </div>
-    {% if servicos %}
+    {% if vendedores %}
       <div class="row g-4">
-        {% for servico in servicos %}
+        {% for v in vendedores %}
         <div class="col-sm-6 col-lg-4">
           <div class="service-card">
             <div class="service-card-header">
-              <span class="game-badge">{{ servico.jogo }}</span>
-              <span class="service-type-badge">{{ servico.categoria }}</span>
+              <span class="game-badge">{{ v.especialidade or 'Geral' }}</span>
             </div>
             <div class="service-card-body">
-              <div class="mb-2">
-                <span class="badge bg-dark border border-secondary text-info"><i class="bi bi-rocket-takeoff-fill me-1"></i> {{ servico.booster.nickname or servico.booster.nome }}</span>
-              </div>
-              <h5 class="text-white mb-2">{{ servico.nome }}</h5>
+              <h5 class="text-white mb-2">{{ v.usuario.nome }}</h5>
               <p class="service-desc text-muted">
-                {{ servico.descricao or "Serviço de boosting de alta qualidade com garantia de resultado." }}
+                Especialidade: {{ v.especialidade or "Diversos jogos" }}
               </p>
               <div class="service-meta">
                 <div class="service-meta-item">
-                  <i class="bi bi-clock me-1 text-primary"></i>
-                  <span>{{ servico.prazo_dias }} dias</span>
+                  <i class="bi bi-star-fill me-1 text-warning"></i>
+                  <span>{{ "%.1f"|format(v.nota_media|float) }} / 5.0</span>
                 </div>
               </div>
             </div>
             <div class="service-card-footer">
-              <span class="service-price">R$ {{ "%.2f"|format(servico.preco|float) }}</span>
-              <button class="btn btn-primary btn-sm" onclick="window.location='{{ url_for('contratacoes.contratar', id=servico.id) }}'">
+              <span class="service-price"></span>
+              {% if current_user.is_authenticated and current_user.tipo_usuario == 'comprador' %}
+              <a class="btn btn-primary btn-sm" href="{{ url_for('services.contratar_vendedor', id=v.id_vendedor) }}">
                 <i class="bi bi-cart-plus me-1"></i>Contratar
-              </button>
+              </a>
+              {% elif not current_user.is_authenticated %}
+              <a class="btn btn-outline-light btn-sm" href="{{ url_for('auth.login') }}">
+                <i class="bi bi-box-arrow-in-right me-1"></i>Login para contratar
+              </a>
+              {% endif %}
             </div>
           </div>
         </div>
@@ -111,14 +113,9 @@
       </div>
     {% else %}
       <div class="empty-state text-center py-5">
-        <i class="bi bi-controller display-1 text-muted"></i>
-        <h4 class="mt-3">Nenhum serviço cadastrado ainda.</h4>
-        <p class="text-muted">Em breve, novos serviços serão disponibilizados.</p>
-        {% if current_user.is_authenticated and current_user.is_admin() %}
-        <a href="{{ url_for('services.novo_servico') }}" class="btn btn-primary mt-2">
-          <i class="bi bi-plus-circle me-2"></i>Adicionar Serviço
-        </a>
-        {% endif %}
+        <i class="bi bi-shop display-1 text-muted"></i>
+        <h4 class="mt-3">Nenhum vendedor cadastrado ainda.</h4>
+        <p class="text-muted">Em breve, novos vendedores serão disponibilizados.</p>
       </div>
     {% endif %}
   </div>
