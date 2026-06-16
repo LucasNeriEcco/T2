@@ -24,7 +24,11 @@ def create_database_if_not_exists():
 
 def create_app():
     create_database_if_not_exists()
-    app = Flask(__name__)
+    app = Flask(
+        __name__,
+        template_folder="../front-end/templates",
+        static_folder="../front-end/static"
+    )
     app.config.from_object(Config)
     db.init_app(app)
 
