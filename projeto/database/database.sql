@@ -1,8 +1,7 @@
-DROP DATABASE IF EXISTS loja_boosting;
-CREATE DATABASE loja_boosting;
+CREATE DATABASE IF NOT EXISTS loja_boosting;
 USE loja_boosting;
 
-CREATE TABLE usuarios (
+CREATE TABLE IF NOT EXISTS usuarios (
     id_usuario INT AUTO_INCREMENT PRIMARY KEY,
     nome VARCHAR(100) NOT NULL,
     email VARCHAR(100) NOT NULL UNIQUE,
@@ -10,7 +9,7 @@ CREATE TABLE usuarios (
     tipo_usuario ENUM('comprador', 'vendedor') NOT NULL
 );
 
-CREATE TABLE vendedores (
+CREATE TABLE IF NOT EXISTS vendedores (
     id_vendedor INT AUTO_INCREMENT PRIMARY KEY,
     id_usuario INT NOT NULL UNIQUE,
     especialidade VARCHAR(100),
@@ -18,7 +17,7 @@ CREATE TABLE vendedores (
     FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario) ON DELETE CASCADE
 );
 
-CREATE TABLE pedidos (
+CREATE TABLE IF NOT EXISTS pedidos (
     id_pedido INT AUTO_INCREMENT PRIMARY KEY,
     id_comprador INT NOT NULL,
     id_vendedor INT NOT NULL,
@@ -32,7 +31,7 @@ CREATE TABLE pedidos (
     FOREIGN KEY (id_vendedor) REFERENCES vendedores(id_vendedor)
 );
 
-CREATE TABLE mensagens (
+CREATE TABLE IF NOT EXISTS mensagens (
     id_mensagem INT AUTO_INCREMENT PRIMARY KEY,
     id_pedido INT NOT NULL,
     remetente INT NOT NULL,
@@ -44,7 +43,7 @@ CREATE TABLE mensagens (
     FOREIGN KEY (destinatario) REFERENCES usuarios(id_usuario)
 );
 
-CREATE TABLE avaliacoes (
+CREATE TABLE IF NOT EXISTS avaliacoes (
     id_avaliacao INT AUTO_INCREMENT PRIMARY KEY,
     id_comprador INT NOT NULL,
     id_vendedor INT NOT NULL,

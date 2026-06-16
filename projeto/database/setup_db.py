@@ -11,8 +11,7 @@ def setup():
 
         cursor = conexao.cursor()
 
-        cursor.execute("DROP DATABASE IF EXISTS loja_boosting")
-        cursor.execute("CREATE DATABASE loja_boosting")
+        cursor.execute("CREATE DATABASE IF NOT EXISTS loja_boosting")
         cursor.execute("USE loja_boosting")
 
         cursor.execute("""
