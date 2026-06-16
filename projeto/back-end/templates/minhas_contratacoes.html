@@ -20,7 +20,6 @@
           <th>Rank</th>
           <th>Valor</th>
           <th>Status</th>
-          <th>Data</th>
           <th>Ações</th>
         </tr>
       </thead>
@@ -41,7 +40,6 @@
               {{ p.status }}
             </span>
           </td>
-          <td>{{ p.created_at.strftime('%d/%m/%Y %H:%M') if p.created_at else '-' }}</td>
           <td>
             <a href="{{ url_for('contratacoes.mensagens_pedido', id=p.id_pedido) }}" class="btn btn-sm btn-outline-info" title="Mensagens">
               <i class="bi bi-chat-dots"></i>

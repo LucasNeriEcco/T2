@@ -11,21 +11,23 @@ def meus_pedidos():
     if current_user.tipo_usuario != "comprador":
         return redirect(url_for("services.meus_pedidos_vendedor"))
 
-    pedidos = Pedido.query.filter_by(id_comprador=current_user.id_usuario).order_by(Pedido.created_at.desc()).all()
+    pedidos = Pedido.query.filter_by(id_comprador=current_user.id_usuario).order_by(Pedido.id_pedido.desc()).all()
     return render_template("minhas_contratacoes.html", pedidos=pedidos)
 
 @contratacoes_bp.route("/pedido/<int:id>/mensagens", methods=["GET", "POST"])
 @login_required
 def mensagens_pedido(id):
     pedido = Pedido.query.get_or_404(id)
-    if pedido.id_comprador != current_user.id_usuario and pedido.id_vendedor != current_user.id_usuario:
+    vendedor_perfil = current_user.vendedor_perfil
+    is_vendedor_do_pedido = vendedor_perfil and pedido.id_vendedor == vendedor_perfil.id_vendedor
+    if pedido.id_comprador != current_user.id_usuario and not is_vendedor_do_pedido:
         flash("Acesso negado.", "danger")
         return redirect(url_for("contratacoes.meus_pedidos"))
 
     form = FormMensagem()
     if form.validate_on_submit():
         if pedido.id_comprador == current_user.id_usuario:
-            dest = pedido.id_vendedor
+            dest = pedido.vendedor.id_usuario
         else:
             dest = pedido.id_comprador
 

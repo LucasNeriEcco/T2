@@ -10,21 +10,17 @@ class Usuario(UserMixin, db.Model):
     id_usuario = db.Column(db.Integer, primary_key=True, autoincrement=True)
     nome = db.Column(db.String(100), nullable=False)
     email = db.Column(db.String(100), unique=True, nullable=False)
-    senha = db.Column(db.String(256), nullable=False)
+    senha = db.Column(db.String(100), nullable=False)
     tipo_usuario = db.Column(
         db.Enum("comprador", "vendedor"),
-        nullable=False,
-        default="comprador"
+        nullable=False
     )
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     vendedor_perfil = db.relationship('Vendedor', backref='usuario', uselist=False, lazy=True, cascade="all, delete-orphan")
     pedidos_como_comprador = db.relationship('Pedido', foreign_keys='Pedido.id_comprador', backref='comprador', lazy=True)
-    pedidos_como_vendedor = db.relationship('Pedido', foreign_keys='Pedido.id_vendedor', backref='vendedor', lazy=True)
     mensagens_enviadas = db.relationship('Mensagem', foreign_keys='Mensagem.remetente', backref='remetente_usuario', lazy=True)
     mensagens_recebidas = db.relationship('Mensagem', foreign_keys='Mensagem.destinatario', backref='destinatario_usuario', lazy=True)
     avaliacoes_como_comprador = db.relationship('Avaliacao', foreign_keys='Avaliacao.id_comprador', backref='comprador_avaliacao', lazy=True)
-    avaliacoes_como_vendedor = db.relationship('Avaliacao', foreign_keys='Avaliacao.id_vendedor', backref='vendedor_avaliacao', lazy=True)
 
     def get_id(self):
         return str(self.id_usuario)
@@ -48,10 +44,12 @@ class Usuario(UserMixin, db.Model):
 class Vendedor(db.Model):
     __tablename__ = "vendedores"
     id_vendedor = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    id_usuario = db.Column(db.Integer, db.ForeignKey('usuarios.id_usuario'), nullable=False)
+    id_usuario = db.Column(db.Integer, db.ForeignKey('usuarios.id_usuario', ondelete="CASCADE"), nullable=False)
     especialidade = db.Column(db.String(100), nullable=True)
     nota_media = db.Column(db.Numeric(3, 2), nullable=True, default=0.00)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    pedidos_como_vendedor = db.relationship('Pedido', foreign_keys='Pedido.id_vendedor', backref='vendedor', lazy=True)
+    avaliacoes_como_vendedor = db.relationship('Avaliacao', foreign_keys='Avaliacao.id_vendedor', backref='vendedor_avaliacao', lazy=True)
 
     def __repr__(self):
         return f"<Vendedor {self.id_vendedor} - Especialidade: {self.especialidade}>"
@@ -61,7 +59,7 @@ class Pedido(db.Model):
     __tablename__ = "pedidos"
     id_pedido = db.Column(db.Integer, primary_key=True, autoincrement=True)
     id_comprador = db.Column(db.Integer, db.ForeignKey('usuarios.id_usuario'), nullable=False)
-    id_vendedor = db.Column(db.Integer, db.ForeignKey('usuarios.id_usuario'), nullable=False)
+    id_vendedor = db.Column(db.Integer, db.ForeignKey('vendedores.id_vendedor'), nullable=False)
     jogo = db.Column(db.String(100), nullable=False)
     servico = db.Column(db.String(100), nullable=False)
     rank_atual = db.Column(db.String(50), nullable=True)
@@ -72,8 +70,6 @@ class Pedido(db.Model):
         nullable=True,
         default='Pendente'
     )
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
     mensagens = db.relationship('Mensagem', backref='pedido', lazy=True, cascade="all, delete-orphan")
 
@@ -98,10 +94,9 @@ class Avaliacao(db.Model):
     __tablename__ = "avaliacoes"
     id_avaliacao = db.Column(db.Integer, primary_key=True, autoincrement=True)
     id_comprador = db.Column(db.Integer, db.ForeignKey('usuarios.id_usuario'), nullable=False)
-    id_vendedor = db.Column(db.Integer, db.ForeignKey('usuarios.id_usuario'), nullable=False)
+    id_vendedor = db.Column(db.Integer, db.ForeignKey('vendedores.id_vendedor'), nullable=False)
     nota = db.Column(db.Integer, nullable=False)
     comentario = db.Column(db.Text, nullable=True)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     def __repr__(self):
         return f"<Avaliacao {self.id_avaliacao} - Nota: {self.nota}>"

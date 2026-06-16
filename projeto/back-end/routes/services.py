@@ -36,7 +36,7 @@ def contratar_vendedor(id):
     if form.validate_on_submit():
         pedido = Pedido(
             id_comprador=current_user.id_usuario,
-            id_vendedor=vendedor_usuario.id_usuario,
+            id_vendedor=vendedor_perfil.id_vendedor,
             jogo=form.jogo.data,
             servico=form.servico.data,
             rank_atual=form.rank_atual.data,
@@ -54,7 +54,8 @@ def contratar_vendedor(id):
 @login_required
 @vendedor_required
 def meus_pedidos_vendedor():
-    pedidos = Pedido.query.filter_by(id_vendedor=current_user.id_usuario).order_by(Pedido.created_at.desc()).all()
+    vendedor_perfil = current_user.vendedor_perfil
+    pedidos = Pedido.query.filter_by(id_vendedor=vendedor_perfil.id_vendedor).order_by(Pedido.id_pedido.desc()).all() if vendedor_perfil else []
     forms = {p.id_pedido: FormStatusPedido(status=p.status) for p in pedidos}
     return render_template("admin_pedidos.html", pedidos=pedidos, forms=forms)
 
@@ -63,7 +64,8 @@ def meus_pedidos_vendedor():
 @vendedor_required
 def atualizar_status_vendedor(id):
     pedido = Pedido.query.get_or_404(id)
-    if pedido.id_vendedor != current_user.id_usuario:
+    vendedor_perfil = current_user.vendedor_perfil
+    if not vendedor_perfil or pedido.id_vendedor != vendedor_perfil.id_vendedor:
         abort(403)
 
     form = FormStatusPedido()
