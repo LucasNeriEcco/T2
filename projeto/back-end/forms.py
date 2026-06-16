@@ -76,7 +76,7 @@ class FormPedido(FlaskForm):
     )
     valor = DecimalField(
         "Valor (R$)",
-        validators=[Optional(),
+        validators=[DataRequired(message="Informe o valor."),
                     NumberRange(min=0.01, message="Valor deve ser maior que zero.")],
         places=2
     )

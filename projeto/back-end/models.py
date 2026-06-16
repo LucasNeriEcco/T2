@@ -10,7 +10,7 @@ class Usuario(UserMixin, db.Model):
     id_usuario = db.Column(db.Integer, primary_key=True, autoincrement=True)
     nome = db.Column(db.String(100), nullable=False)
     email = db.Column(db.String(100), unique=True, nullable=False)
-    senha = db.Column(db.String(100), nullable=False)
+    senha = db.Column(db.String(255), nullable=False)
     tipo_usuario = db.Column(
         db.Enum("comprador", "vendedor"),
         nullable=False
@@ -44,7 +44,7 @@ class Usuario(UserMixin, db.Model):
 class Vendedor(db.Model):
     __tablename__ = "vendedores"
     id_vendedor = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    id_usuario = db.Column(db.Integer, db.ForeignKey('usuarios.id_usuario', ondelete="CASCADE"), nullable=False)
+    id_usuario = db.Column(db.Integer, db.ForeignKey('usuarios.id_usuario', ondelete="CASCADE"), nullable=False, unique=True)
     especialidade = db.Column(db.String(100), nullable=True)
     nota_media = db.Column(db.Numeric(3, 2), nullable=True, default=0.00)
 
@@ -64,7 +64,7 @@ class Pedido(db.Model):
     servico = db.Column(db.String(100), nullable=False)
     rank_atual = db.Column(db.String(50), nullable=True)
     rank_desejado = db.Column(db.String(50), nullable=True)
-    valor = db.Column(db.Numeric(10, 2), nullable=True)
+    valor = db.Column(db.Numeric(10, 2), nullable=False)
     status = db.Column(
         db.Enum('Pendente', 'Aceito', 'Em andamento', 'Concluido', 'Cancelado'),
         nullable=True,

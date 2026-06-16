@@ -89,7 +89,7 @@
               </div>
             </div>
             <div class="mb-4 form-check">
-              {{ form.termos(class="form-check-input bg-dark border-secondary" + (" is-invalid" if form.termos.errors else "")) }}
+              {{ form.termos(class="form-check-input" + (" is-invalid" if form.termos.errors else ""), required=True) }}
               <label class="form-check-label text-muted small" for="{{ form.termos.id }}">
                 {{ form.termos.label.text }}
               </label>

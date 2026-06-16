@@ -582,3 +582,13 @@ body {
 .bg-info { background-color: var(--clr-info) !important; color: #000 !important; }
 .border-primary { border-color: var(--clr-primary) !important; }
 .border-info { border-color: var(--clr-info) !important; }
+
+.form-check-input {
+  background-color: var(--clr-surface-2) !important;
+  border-color: var(--clr-border-2) !important;
+  cursor: pointer;
+}
+.form-check-input:checked {
+  background-color: var(--clr-success) !important;
+  border-color: var(--clr-success) !important;
+}
