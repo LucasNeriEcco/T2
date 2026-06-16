@@ -6,7 +6,24 @@ from routes.auth import auth_bp
 from routes.services import services_bp
 from routes.contratacoes import contratacoes_bp
 
+import pymysql
+
+def create_database_if_not_exists():
+    try:
+        conn = pymysql.connect(
+            host="127.0.0.1",
+            port=3306,
+            user="root",
+            password="963968"
+        )
+        cursor = conn.cursor()
+        cursor.execute("CREATE DATABASE IF NOT EXISTS loja_boosting")
+        conn.close()
+    except Exception as e:
+        pass
+
 def create_app():
+    create_database_if_not_exists()
     app = Flask(__name__)
     app.config.from_object(Config)
     db.init_app(app)
